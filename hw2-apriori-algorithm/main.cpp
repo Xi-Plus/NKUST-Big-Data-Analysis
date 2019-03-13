@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <ctime>
 #include <iostream>
+#include <map>
 #include <set>
 #include <unordered_map>
 #include <vector>
@@ -41,7 +42,7 @@ int main(int argc, char *argv[]) {
 		printf("Fail to open output file");
 		return 0;
 	}
-	unordered_map<int, int> map;
+	unordered_map<int, int> C1;
 	while (true) {
 		tempn = readint(fin);
 		if (feof(fin)) break;
@@ -49,13 +50,14 @@ int main(int argc, char *argv[]) {
 		cnt = readint(fin);
 		while (cnt--) {
 			tempn = readint(fin);
-			map[tempn]++;
+			C1[tempn]++;
 		}
 	}
 	fclose(fin);
 
 	Lsup.clear();
-	for (auto &v : map) {
+	map<int, int> tempm(C1.begin(), C1.end());
+	for (auto &v : tempm) {
 		if (v.second >= support) {
 			Lits.push_back(vector<int>(1, v.first));
 			Lsup.push_back(v.second);
