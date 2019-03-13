@@ -1,7 +1,6 @@
 #include <algorithm>
 #include <ctime>
 #include <iostream>
-#include <map>
 #include <set>
 #include <unordered_map>
 #include <vector>
@@ -9,7 +8,7 @@ using namespace std;
 
 struct Node {
 	unsigned int val, level;
-	map<int, Node *> child;
+	unordered_map<int, Node *> child;
 };
 
 unsigned char temps[5];
@@ -78,8 +77,7 @@ int main(int argc, char *argv[]) {
 	fclose(fin);
 
 	Lsup.clear();
-	map<int, int> tempm(C1.begin(), C1.end());
-	for (auto &v : tempm) {
+	for (auto &v : C1) {
 		if (v.second >= support) {
 			Lits.push_back(vector<int>(1, v.first));
 			Lsup.push_back(v.second);
