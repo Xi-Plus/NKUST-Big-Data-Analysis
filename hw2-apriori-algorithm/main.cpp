@@ -7,11 +7,33 @@
 #include <vector>
 using namespace std;
 
+struct Node {
+	unsigned int val, level;
+	map<int, Node *> child;
+};
+
 unsigned char temps[5];
-vector<int> tempv, Csup, Lsup;
+vector<int> tempv, Lsup;
+unordered_map<Node *, int> Csup;
 vector<vector<int>> Cits, Ctemp, Lits;
 set<vector<int>> Lset;
 int tempa, tempb;
+
+unsigned int grouplen = 1, support;
+void dfs(Node *&now, vector<int> item) {
+	if (now->level == grouplen) {
+		if (Csup[now] >= support) {
+			Lits.push_back(item);
+			Lsup.push_back(Csup[now]);
+		}
+	} else {
+		for (auto &next : now->child) {
+			vector<int> nextitem = item;
+			nextitem.push_back(next.first);
+			dfs(next.second, nextitem);
+		}
+	}
+}
 
 inline unsigned int readint(FILE *&file) {
 	fread(temps, 1, 4, file);
@@ -24,7 +46,7 @@ int main(int argc, char *argv[]) {
 		printf("Missing parameter\n");
 		return 0;
 	}
-	unsigned int support = atoi(argv[3]);
+	support = atoi(argv[3]);
 	printf("file input: %s\n", argv[1]);
 	printf("file output: %s\n", argv[2]);
 	printf("support: %d\n", support);
@@ -64,7 +86,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	int grouplen = 1, Llensum = 0;
+	int Llensum = 0;
 	while (Lits.size()) {
 		// output file
 		for (int i = 0; i < Lits.size(); i++) {
@@ -117,7 +139,24 @@ int main(int argc, char *argv[]) {
 				Cits.push_back(itemset);
 			}
 		}
-		Csup = vector<int>(Cits.size(), 0);
+
+		Csup.clear();
+
+		Node *root = new Node(), *now;
+		root->val = -1;
+		root->level = 0;
+		for (auto &item : Cits) {
+			now = root;
+			for (int j = 0; j < grouplen; j++) {
+				if (now->child.find(item[j]) == now->child.end()) {
+					now->child[item[j]] = new Node();
+					now->child[item[j]]->val = item[j];
+					now->child[item[j]]->level = j + 1;
+				}
+				now = now->child[item[j]];
+			}
+			Csup[now] = 0;
+		}
 
 		// cnt sup
 		fin = fopen(argv[1], "rb");
@@ -127,19 +166,24 @@ int main(int argc, char *argv[]) {
 		}
 		unsigned int tempn, cnt;
 		unordered_map<int, int> map;
+		vector<Node *> nownode;
 		while (true) {
 			tempn = readint(fin);
 			if (feof(fin)) break;
 			readint(fin);
 			cnt = readint(fin);
-			tempv.clear();
+			nownode.clear();
+			nownode.push_back(root);
 			while (cnt--) {
 				tempn = readint(fin);
-				tempv.push_back(tempn);
-			}
-			for (int i = 0; i < Cits.size(); i++) {
-				if (includes(tempv.begin(), tempv.end(), Cits[i].begin(), Cits[i].end())) {
-					Csup[i]++;
+				for (int i = nownode.size() - 1; i >= 0; i--) {
+					if (nownode[i]->child.find(tempn) != nownode[i]->child.end()) {
+						if (nownode[i]->child[tempn]->level == grouplen) {
+							Csup[nownode[i]->child[tempn]]++;
+						} else {
+							nownode.push_back(nownode[i]->child[tempn]);
+						}
+					}
 				}
 			}
 		}
@@ -147,12 +191,7 @@ int main(int argc, char *argv[]) {
 		// filter support
 		Lits.clear();
 		Lsup.clear();
-		for (int i = 0; i < Cits.size(); i++) {
-			if (Csup[i] >= support) {
-				Lits.push_back(Cits[i]);
-				Lsup.push_back(Csup[i]);
-			}
-		}
+		dfs(root, vector<int>());
 	}
 
 	fclose(fout);
