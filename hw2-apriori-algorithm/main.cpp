@@ -163,7 +163,6 @@ int main(int argc, char *argv[]) {
 			return 0;
 		}
 		unsigned int tempn, cnt;
-		unordered_map<int, int> map;
 		vector<Node *> nownode;
 		while (true) {
 			tempn = readint(fin);
