@@ -12,7 +12,7 @@ vector<vector<int>> Cits, Ctemp, Lits;
 set<vector<int>> Lset;
 int tempa, tempb;
 
-unsigned int readint(FILE *file) {
+inline unsigned int readint(FILE *&file) {
 	fread(temps, 1, 4, file);
 	return temps[0] | temps[1] << 8 | temps[2] << 16 | temps[3] << 24;
 }
