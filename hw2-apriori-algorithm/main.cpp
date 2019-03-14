@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cstdio>
 #include <ctime>
 #include <iostream>
 #include <set>
@@ -40,28 +41,42 @@ inline unsigned int readint(FILE *&file) {
 }
 
 int main(int argc, char *argv[]) {
-	clock_t start_time = clock();
+	char inputpath[100];
+	char outputpath[100];
 	if (argc < 4) {
 		printf("Missing parameter\n");
-		return 0;
+		string temps;
+		printf("file input:");
+		getline(cin, temps);
+		strcpy(inputpath, temps.c_str());
+		printf("file output: ");
+		getline(cin, temps);
+		strcpy(outputpath, temps.c_str());
+		printf("support: ");
+		cin >> support;
+	} else {
+		strcpy(inputpath, argv[1]);
+		strcpy(outputpath, argv[2]);
+		support = atoi(argv[3]);
+		printf("file input: %s\n", inputpath);
+		printf("file output: %s\n", outputpath);
+		printf("support: %d\n", support);
 	}
-	support = atoi(argv[3]);
-	printf("file input: %s\n", argv[1]);
-	printf("file output: %s\n", argv[2]);
-	printf("support: %d\n", support);
+
+	clock_t start_time = clock();
 
 	FILE *fin, *fout;
 	unsigned int tempn, cnt;
 
-	fin = fopen(argv[1], "rb");
+	fin = fopen(inputpath, "rb");
 	if (fin == NULL) {
-		printf("Fail to open input file");
-		return 0;
+		cerr << "Fail to open input file";
+		return 1;
 	}
-	fout = fopen(argv[2], "w");
+	fout = fopen(outputpath, "w");
 	if (fout == NULL) {
-		printf("Fail to open output file");
-		return 0;
+		cerr << "Fail to open output file";
+		return 1;
 	}
 	unordered_map<int, int> C1;
 	while (true) {
@@ -157,10 +172,10 @@ int main(int argc, char *argv[]) {
 		}
 
 		// cnt sup
-		fin = fopen(argv[1], "rb");
+		fin = fopen(inputpath, "rb");
 		if (fin == NULL) {
-			printf("Fail to open input file");
-			return 0;
+			fprintf(stderr, "Fail to open input file");
+			return 1;
 		}
 		unsigned int tempn, cnt;
 		vector<Node *> nownode;
