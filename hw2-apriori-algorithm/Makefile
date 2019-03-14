@@ -4,7 +4,7 @@ main.exe: main.cpp
 	C:/mingw-w64/mingw64/bin/g++.exe main.cpp -o main.exe -std=c++17 -O3
 
 main: main.cpp
-	g++ main.cpp -o main.exe -std=c++17 -O3
+	g++ main.cpp -o main -std=c++17 -O3
 
 0: main.exe
 	main.exe small.data small-out.txt 2
