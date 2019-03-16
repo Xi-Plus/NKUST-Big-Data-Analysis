@@ -12,7 +12,6 @@ struct Node {
 	unordered_map<int, Node *> child;
 };
 
-unsigned char temps[5];
 vector<int> tempv, Lsup;
 unordered_map<Node *, int> Csup;
 vector<vector<int>> Cits, Ctemp, Lits;
@@ -36,8 +35,8 @@ void dfs(Node *&now, vector<int> item) {
 }
 
 inline unsigned int readint(FILE *&file) {
-	fread(temps, 1, 4, file);
-	return temps[0] | temps[1] << 8 | temps[2] << 16 | temps[3] << 24;
+	fread(&tempa, 1, 4, file);
+	return tempa;
 }
 
 int main(int argc, char *argv[]) {
