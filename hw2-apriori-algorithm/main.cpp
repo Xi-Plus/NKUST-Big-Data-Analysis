@@ -58,10 +58,10 @@ int main(int argc, char *argv[]) {
 		strcpy(inputpath, argv[1]);
 		strcpy(outputpath, argv[2]);
 		support = atoi(argv[3]);
-		printf("file input: %s\n", inputpath);
-		printf("file output: %s\n", outputpath);
-		printf("support: %d\n", support);
 	}
+	printf("file input: %s\n", inputpath);
+	printf("file output: %s\n", outputpath);
+	printf("support: %d\n", support);
 
 	clock_t start_time = clock();
 
