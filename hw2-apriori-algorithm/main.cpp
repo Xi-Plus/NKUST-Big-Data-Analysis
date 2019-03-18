@@ -3,7 +3,7 @@
 #include <ctime>
 #include <iostream>
 #include <string>
-#include "apriori.cpp"
+#include "apriori.h"
 
 using namespace std;
 

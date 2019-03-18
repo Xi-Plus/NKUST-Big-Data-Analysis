@@ -1,7 +1,13 @@
 all: 1
 
-main.exe: main.cpp
-	C:/mingw-w64/mingw64/bin/g++.exe main.cpp -o main.exe -std=c++11 -O3
+main.exe: apriori.o main.o
+	gcc -o main apriori.o main.o -lstdc++ -std=c++11 -O3
+
+apriori.o: apriori.cpp apriori.h
+	g++ -c apriori.cpp -std=c++11 -O3
+
+main.o: main.cpp
+	g++ -c main.cpp -std=c++11 -O3
 
 main: main.cpp
 	g++ main.cpp -o main -std=c++11 -O3
