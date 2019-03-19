@@ -1,3 +1,4 @@
+#include "apriori.h"
 #include <algorithm>
 #include <cstdio>
 #include <cstring>
@@ -5,12 +6,19 @@
 #include <set>
 #include <unordered_map>
 #include <vector>
-#include "apriori.h"
 
 Apriori::Apriori(char *_inputpath, char *_outputpath, unsigned int _support) {
 	strcpy(inputpath, _inputpath);
 	strcpy(outputpath, _outputpath);
 	support = _support;
+}
+
+void Apriori::showCtemp(bool setting) {
+	isshowCtemp = setting;
+}
+
+void Apriori::showCits(bool setting) {
+	isshowCits = setting;
 }
 
 unsigned int Apriori::run() {
@@ -29,20 +37,22 @@ unsigned int Apriori::run() {
 	generateL1();
 
 	int Llensum = 0;
-	while (Lits.size()) {
+	while (root->child.size()) {
+		Llen = 0;
 		outputFile();
 
-		printf("L%d: %d\n", grouplen, Lits.size());
-		Llensum += Lits.size();
+		Llensum += Llen;
+		printf("L%d: %d (sum: %d)\n", grouplen, Llen, Llensum);
 
 		generateCtemp();
-		if (showCtemp) {
+		if (isshowCtemp) {
 			printf("C%dtemp: %d\n", grouplen + 1, Ctemp.size());
+			printf("L%dset: %d\n", grouplen + 1, Lset.size());
 		}
 		grouplen++;
 
 		generateC();
-		if (showCits) {
+		if (isshowCits) {
 			printf("C%dits: %d\n", grouplen, Cits.size());
 		}
 
@@ -76,50 +86,73 @@ void Apriori::generateC1() {
 }
 
 void Apriori::generateL1() {
-	Lsup.clear();
+	Csup.clear();
+	root = new Node();
+	root->level = 0;
 	for (auto &v : C1) {
 		if (v.second >= support) {
-			Lits.push_back(std::vector<int>(1, v.first));
-			Lsup.push_back(v.second);
+			root->child[v.first] = new Node();
+			root->child[v.first]->level = 1;
+			Csup[root->child[v.first]] = v.second;
+		}
+	}
+}
+
+void Apriori::dfsOutputFile(Node *&now, std::vector<unsigned int> item) {
+	if (now->level == grouplen) {
+		fprintf(fout, "%d", item[1]);
+		for (int j = 2; j <= grouplen; j++) {
+			fprintf(fout, ",%d", item[j]);
+		}
+		fprintf(fout, ":%d\n", Csup[now]);
+		Llen++;
+	} else {
+		for (auto &next : now->child) {
+			std::vector<unsigned int> nextitem = item;
+			nextitem.push_back(next.first);
+			dfsOutputFile(next.second, nextitem);
 		}
 	}
 }
 
 void Apriori::outputFile() {
-	for (int i = 0; i < Lits.size(); i++) {
-		fprintf(fout, "%d", Lits[i][0]);
-		for (int j = 1; j < grouplen; j++) {
-			fprintf(fout, ",%d", Lits[i][j]);
+	dfsOutputFile(root, std::vector<unsigned int>());
+}
+
+void Apriori::dfsGenerateCtemp(Node *&now, std::vector<unsigned int> item) {
+	if (now->level == grouplen) {
+		Lset.insert(item);
+		return;
+	}
+	if (now->level == grouplen - 1) {
+		if (now->child.size() >= 2) {
+			for (auto i = now->child.begin(); i != now->child.end(); i++) {
+				for (auto j = std::next(i, 1); j != now->child.end(); j++) {
+					Ctemp.push_back(item);
+					tempa = i->first;
+					tempb = j->first;
+					if (tempa > tempb) std::swap(tempa, tempb);
+					Ctemp[Ctemp.size() - 1].push_back(tempa);
+					Ctemp[Ctemp.size() - 1].push_back(tempb);
+				}
+			}
 		}
-		fprintf(fout, ":%d\n", Lsup[i]);
+	}
+	for (auto &next : now->child) {
+		std::vector<unsigned int> nextitem = item;
+		nextitem.push_back(next.first);
+		dfsGenerateCtemp(next.second, nextitem);
 	}
 }
 
 void Apriori::generateCtemp() {
 	Ctemp.clear();
+	Lset.clear();
 
-	// cross join
-	for (int i = 0; i < Lits.size(); i++) {
-		for (int j = i + 1; j < Lits.size(); j++) {
-			int k = 0;
-			while (k < grouplen - 1 && Lits[i][k] == Lits[j][k]) k++;
-			if (k == grouplen - 1) {
-				Ctemp.push_back(Lits[i]);
-				tempa = Lits[i][grouplen - 1];
-				tempb = Lits[j][grouplen - 1];
-				if (tempa > tempb) std::swap(tempa, tempb);
-				Ctemp[Ctemp.size() - 1][grouplen - 1] = tempa;
-				Ctemp[Ctemp.size() - 1].push_back(tempb);
-			}
-		}
-	}
+	dfsGenerateCtemp(root, std::vector<unsigned int>());
 }
 
 void Apriori::generateC() {
-	Lset.clear();
-	for (auto &itemset : Lits) {
-		Lset.insert(itemset);
-	}
 	Cits.clear();
 	for (auto &itemset : Ctemp) {
 		int i = 0;
@@ -186,24 +219,25 @@ void Apriori::generateCsup() {
 	fclose(fin);
 }
 
-void Apriori::dfs(Node *&now, std::vector<int> item) {
-	if (now->level == grouplen) {
-		if (Csup[now] >= support) {
-			Lits.push_back(item);
-			Lsup.push_back(Csup[now]);
-		}
-	} else {
+void Apriori::dfs(Node *&now) {
+	if (now->level == grouplen - 1) {
 		for (auto &next : now->child) {
-			std::vector<int> nextitem = item;
-			nextitem.push_back(next.first);
-			dfs(next.second, nextitem);
+			if (Csup[next.second] < support) {
+				now->child.erase(next.first);
+			}
+		}
+	} else if (now->level < grouplen - 1) {
+		for (auto &next : now->child) {
+			dfs(next.second);
+		}
+		for (auto &next : now->child) {
+			if (next.second->child.size() == 0) {
+				now->child.erase(next.first);
+			}
 		}
 	}
 }
 
 void Apriori::generateL() {
-	// filter support
-	this->Lits.clear();
-	this->Lsup.clear();
-	dfs(root, std::vector<int>());
+	dfs(root);
 }

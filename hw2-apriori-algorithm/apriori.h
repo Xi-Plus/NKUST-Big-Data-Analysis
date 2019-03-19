@@ -20,33 +20,35 @@ class Apriori {
 	unsigned int support;
 	FILE *fin, *fout;
 	std::unordered_map<int, int> C1;
-	std::vector<int> tempv, Lsup;
+	std::vector<unsigned int> tempv, Lsup;
 	std::unordered_map<Node *, int> Csup;
-	std::vector<std::vector<int>> Cits, Ctemp, Lits;
-	std::set<std::vector<int>> Lset;
+	std::vector<std::vector<unsigned int>> Cits, Ctemp, Lits;
+	std::set<std::vector<unsigned int>> Lset;
 	int tempa, tempb;
 	unsigned int tempn, cnt;
 	Node *root;
 	unsigned int grouplen = 1;
-	int Llensum;
-
-   public:
-	bool showCtemp = false, showCits = false;
+	int Llen, Llensum;
+	bool isshowCtemp = false, isshowCits = false;
 
    public:
 	Apriori(char *_inputpath, char *_outputpath, unsigned int _support);
 	unsigned int run();
+	void showCtemp(bool setting);
+	void showCits(bool setting);
 
    private:
 	inline unsigned int readint(FILE *&file);
 
 	void generateC1();
 	void generateL1();
+	void dfsOutputFile(Node *&now, std::vector<unsigned int> item);
 	void outputFile();
+	void dfsGenerateCtemp(Node *&now, std::vector<unsigned int> item);
 	void generateCtemp();
 	void generateC();
 	void generateCsup();
-	void dfs(Node *&now, std::vector<int> item);
+	void dfs(Node *&now);
 	void generateL();
 };
 
