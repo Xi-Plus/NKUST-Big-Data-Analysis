@@ -205,7 +205,7 @@ void Apriori::generateCsup() {
 		nownode.clear();
 		nownode.push_back(root);
 		while (cnt--) {
-			tempn = readint(fin);
+			tempn = readint();
 			for (int i = nownode.size() - 1; i >= 0; i--) {
 				if (nownode[i]->child.find(tempn) != nownode[i]->child.end()) {
 					if (nownode[i]->child[tempn]->level == grouplen) {
