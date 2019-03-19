@@ -61,8 +61,8 @@ unsigned int Apriori::run() {
 	return Llensum;
 }
 
-inline unsigned int Apriori::readint(FILE *&file) {
-	fread(&tempa, 1, 4, file);
+inline unsigned int Apriori::readint() {
+	fread(&tempa, 1, 4, fin);
 	return tempa;
 }
 
@@ -74,12 +74,12 @@ void Apriori::generateC1() {
 	}
 
 	while (true) {
-		tempn = readint(fin);
+		readint();
 		if (feof(fin)) break;
-		readint(fin);
-		cnt = readint(fin);
+		readint();
+		cnt = readint();
 		while (cnt--) {
-			tempn = readint(fin);
+			tempn = readint();
 			C1[tempn]++;
 		}
 	}
@@ -198,10 +198,10 @@ void Apriori::generateCsup() {
 	unsigned int cnt;
 	std::vector<Node *> nownode;
 	while (true) {
-		tempn = readint(fin);
+		tempn = readint();
 		if (feof(fin)) break;
-		readint(fin);
-		cnt = readint(fin);
+		readint();
+		cnt = readint();
 		nownode.clear();
 		nownode.push_back(root);
 		while (cnt--) {

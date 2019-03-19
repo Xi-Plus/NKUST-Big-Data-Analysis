@@ -42,7 +42,7 @@ class Apriori {
 	void showCits(bool setting);
 
    private:
-	inline unsigned int readint(FILE *&file);
+	inline unsigned int readint();
 
 	void generateC1();
 	void generateL1();
