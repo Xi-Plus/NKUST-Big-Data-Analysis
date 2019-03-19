@@ -104,7 +104,7 @@ void Apriori::dfsOutputFile(Node *&now, std::vector<unsigned int> item) {
 	if (now->level == grouplen) {
 		fout << item[1];
 		for (int j = 2; j <= grouplen; j++) {
-			fout << "," << item[1];
+			fout << "," << item[j];
 		}
 		fout << ":" << Csup[now] << "\n";
 		Llen++;
