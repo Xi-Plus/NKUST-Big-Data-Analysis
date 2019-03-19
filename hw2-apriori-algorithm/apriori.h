@@ -16,20 +16,24 @@ class Apriori {
 		std::unordered_map<int, Node *> child;
 	};
 
+	// Arguments
 	char inputpath[100], outputpath[100];
 	unsigned int support;
 	FILE *fin, *fout;
+	// Data
 	std::unordered_map<int, int> C1;
-	std::vector<unsigned int> tempv, Lsup;
 	std::unordered_map<Node *, int> Csup;
-	std::vector<std::vector<unsigned int>> Cits, Ctemp, Lits;
+	std::vector<std::vector<unsigned int>> Cits, Ctemp;
 	std::set<std::vector<unsigned int>> Lset;
-	int tempa, tempb;
-	unsigned int tempn, cnt;
 	Node *root;
 	unsigned int grouplen = 1;
-	int Llen, Llensum;
+	unsigned int Llen;
+	// Setting
 	bool isshowCtemp = false, isshowCits = false;
+	// Temporary variables
+	int tempa, tempb;
+	unsigned int tempn, cnt;
+	std::vector<unsigned int> tempv;
 
    public:
 	Apriori(char *_inputpath, char *_outputpath, unsigned int _support);

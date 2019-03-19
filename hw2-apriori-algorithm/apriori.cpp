@@ -22,11 +22,6 @@ void Apriori::showCits(bool setting) {
 }
 
 unsigned int Apriori::run() {
-	fin = fopen(inputpath, "rb");
-	if (fin == NULL) {
-		std::cerr << "Fail to open input file";
-		return 1;
-	}
 	fout = fopen(outputpath, "w");
 	if (fout == NULL) {
 		std::cerr << "Fail to open output file";
@@ -36,7 +31,7 @@ unsigned int Apriori::run() {
 	generateC1();
 	generateL1();
 
-	int Llensum = 0;
+	unsigned int Llensum = 0;
 	while (root->child.size()) {
 		Llen = 0;
 		outputFile();
@@ -72,6 +67,12 @@ inline unsigned int Apriori::readint(FILE *&file) {
 }
 
 void Apriori::generateC1() {
+	fin = fopen(inputpath, "rb");
+	if (fin == NULL) {
+		std::cerr << "Fail to open input file";
+		exit(1);
+	}
+
 	while (true) {
 		tempn = readint(fin);
 		if (feof(fin)) break;

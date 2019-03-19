@@ -39,4 +39,6 @@ int main(int argc, char *argv[]) {
 
 	printf("Lall: %d\n", Llensum);
 	printf("It tooks %d milliseconds\n", (clock() - start_time) * 1000 / CLOCKS_PER_SEC);
+
+	return 0;
 }
