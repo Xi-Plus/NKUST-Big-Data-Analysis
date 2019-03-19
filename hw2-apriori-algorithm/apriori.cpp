@@ -102,8 +102,8 @@ void Apriori::generateL1() {
 
 void Apriori::dfsOutputFile(Node *&now, std::vector<unsigned int> item) {
 	if (now->level == grouplen) {
-		fout << item[1];
-		for (int j = 2; j <= grouplen; j++) {
+		fout << item[0];
+		for (int j = 1; j < grouplen; j++) {
 			fout << "," << item[j];
 		}
 		fout << ":" << Csup[now] << "\n";
