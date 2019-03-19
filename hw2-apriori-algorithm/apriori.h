@@ -12,7 +12,7 @@
 class Apriori {
    private:
 	struct Node {
-		unsigned int val, level;
+		unsigned int level;
 		std::unordered_map<int, Node *> child;
 	};
 

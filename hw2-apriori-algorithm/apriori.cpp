@@ -142,14 +142,12 @@ void Apriori::generateCsup() {
 
 	Node *now;
 	root = new Node();
-	root->val = -1;
 	root->level = 0;
 	for (auto &item : Cits) {
 		now = root;
 		for (int j = 0; j < grouplen; j++) {
 			if (now->child.find(item[j]) == now->child.end()) {
 				now->child[item[j]] = new Node();
-				now->child[item[j]]->val = item[j];
 				now->child[item[j]]->level = j + 1;
 			}
 			now = now->child[item[j]];
