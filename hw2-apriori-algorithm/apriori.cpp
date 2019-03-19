@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cstdio>
 #include <cstring>
+#include <fstream>
 #include <iostream>
 #include <set>
 #include <unordered_map>
@@ -22,10 +23,10 @@ void Apriori::showCits(bool setting) {
 }
 
 unsigned int Apriori::run() {
-	fout = fopen(outputpath, "w");
-	if (fout == NULL) {
+	fout.open(outputpath, std::fstream::out);
+	if (!fout.is_open()) {
 		std::cerr << "Fail to open output file";
-		return 1;
+		exit(1);
 	}
 
 	generateC1();
@@ -56,26 +57,26 @@ unsigned int Apriori::run() {
 		generateL();
 	}
 
-	fclose(fout);
+	fout.close();
 
 	return Llensum;
 }
 
 inline unsigned int Apriori::readint() {
-	fread(&tempa, 1, 4, fin);
+	fin.read((char *)&tempa, 4);
 	return tempa;
 }
 
 void Apriori::generateC1() {
-	fin = fopen(inputpath, "rb");
-	if (fin == NULL) {
+	fin.open(inputpath, std::fstream::in | std::fstream::binary);
+	if (!fin.is_open()) {
 		std::cerr << "Fail to open input file";
 		exit(1);
 	}
 
 	while (true) {
 		readint();
-		if (feof(fin)) break;
+		if (fin.eof()) break;
 		readint();
 		cnt = readint();
 		while (cnt--) {
@@ -83,7 +84,7 @@ void Apriori::generateC1() {
 			C1[tempn]++;
 		}
 	}
-	fclose(fin);
+	fin.close();
 }
 
 void Apriori::generateL1() {
@@ -101,11 +102,11 @@ void Apriori::generateL1() {
 
 void Apriori::dfsOutputFile(Node *&now, std::vector<unsigned int> item) {
 	if (now->level == grouplen) {
-		fprintf(fout, "%d", item[1]);
+		fout << item[1];
 		for (int j = 2; j <= grouplen; j++) {
-			fprintf(fout, ",%d", item[j]);
+			fout << "," << item[1];
 		}
-		fprintf(fout, ":%d\n", Csup[now]);
+		fout << ":" << Csup[now] << "\n";
 		Llen++;
 	} else {
 		for (auto &next : now->child) {
@@ -190,16 +191,16 @@ void Apriori::generateCsup() {
 	}
 
 	// cnt sup
-	fin = fopen(inputpath, "rb");
-	if (fin == NULL) {
-		fprintf(stderr, "Fail to open input file");
+	fin.open(inputpath, std::fstream::in | std::fstream::binary);
+	if (!fin.is_open()) {
+		std::cerr << "Fail to open input file";
 		exit(1);
 	}
 	unsigned int cnt;
 	std::vector<Node *> nownode;
 	while (true) {
 		tempn = readint();
-		if (feof(fin)) break;
+		if (fin.eof()) break;
 		readint();
 		cnt = readint();
 		nownode.clear();
@@ -217,7 +218,7 @@ void Apriori::generateCsup() {
 			}
 		}
 	}
-	fclose(fin);
+	fin.close();
 }
 
 void Apriori::dfs(Node *&now) {

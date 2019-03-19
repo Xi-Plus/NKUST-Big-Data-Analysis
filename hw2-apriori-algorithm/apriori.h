@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cstdio>
 #include <cstring>
+#include <fstream>
 #include <iostream>
 #include <set>
 #include <unordered_map>
@@ -19,7 +20,7 @@ class Apriori {
 	// Arguments
 	char inputpath[100], outputpath[100];
 	unsigned int support;
-	FILE *fin, *fout;
+	std::fstream fin, fout;
 	// Data
 	std::unordered_map<int, int> C1;
 	std::unordered_map<Node *, int> Csup;
