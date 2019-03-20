@@ -111,15 +111,19 @@ void Apriori::generateL1() {
 
 void Apriori::dfsOutputFile(Node *&now, std::vector<unsigned int> item) {
 	if (now->level == grouplen) {
+		// outputFile
 		fout << item[0];
 		for (int j = 1; j < grouplen; j++) {
 			fout << "," << item[j];
 		}
 		fout << ":" << Csup[now] << "\n";
+		// generateLset
 		Lset.insert(item);
+		// count L size
 		Llen++;
 		return;
 	} else if (now->level == grouplen - 1) {
+		// generateCtemp
 		if (now->child.size() >= 2) {
 			for (auto i = now->child.begin(); i != now->child.end(); i++) {
 				for (auto j = std::next(i, 1); j != now->child.end(); j++) {
