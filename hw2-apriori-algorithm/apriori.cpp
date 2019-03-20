@@ -119,6 +119,7 @@ void Apriori::dfsOutputFile(Node *&now, std::vector<unsigned int> item) {
 			fout << "," << item[j];
 		}
 		fout << ":" << Csup[now] << "\n";
+		Lset.insert(item);
 		Llen++;
 	} else {
 		for (auto &next : now->child) {
@@ -130,14 +131,12 @@ void Apriori::dfsOutputFile(Node *&now, std::vector<unsigned int> item) {
 }
 
 void Apriori::outputFile() {
+	Lset.clear();
+
 	dfsOutputFile(root, std::vector<unsigned int>());
 }
 
 void Apriori::dfsGenerateCtemp(Node *&now, std::vector<unsigned int> item) {
-	if (now->level == grouplen) {
-		Lset.insert(item);
-		return;
-	}
 	if (now->level == grouplen - 1) {
 		if (now->child.size() >= 2) {
 			for (auto i = now->child.begin(); i != now->child.end(); i++) {
@@ -161,7 +160,6 @@ void Apriori::dfsGenerateCtemp(Node *&now, std::vector<unsigned int> item) {
 
 void Apriori::generateCtemp() {
 	Ctemp.clear();
-	Lset.clear();
 
 	dfsGenerateCtemp(root, std::vector<unsigned int>());
 }
