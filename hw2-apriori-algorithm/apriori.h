@@ -51,7 +51,7 @@ class Apriori {
 	void outputFile();
 	void generateC();
 	void generateCsup();
-	void dfs(Node *&now);
+	void dfsGenerateL(Node *&now);
 	void generateL();
 };
 

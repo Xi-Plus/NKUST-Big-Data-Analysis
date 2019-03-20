@@ -218,7 +218,7 @@ void Apriori::generateCsup() {
 	printf("  cntSup tooks %d milliseconds\n", (clock() - start_time) * 1000 / CLOCKS_PER_SEC);
 }
 
-void Apriori::dfs(Node *&now) {
+void Apriori::dfsGenerateL(Node *&now) {
 	if (now->level == grouplen - 1) {
 		for (auto &next : now->child) {
 			if (Csup[next.second] < support) {
@@ -227,7 +227,7 @@ void Apriori::dfs(Node *&now) {
 		}
 	} else if (now->level < grouplen - 1) {
 		for (auto &next : now->child) {
-			dfs(next.second);
+			dfsGenerateL(next.second);
 		}
 		for (auto &next : now->child) {
 			if (next.second->child.size() == 0) {
@@ -238,5 +238,5 @@ void Apriori::dfs(Node *&now) {
 }
 
 void Apriori::generateL() {
-	dfs(root);
+	dfsGenerateL(root);
 }
