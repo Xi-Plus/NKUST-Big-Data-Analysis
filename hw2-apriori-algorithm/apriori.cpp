@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <cstdio>
 #include <cstring>
+#include <ctime>
 #include <fstream>
 #include <iostream>
 #include <set>
@@ -33,28 +34,39 @@ unsigned int Apriori::run() {
 	generateL1();
 
 	unsigned int Llensum = 0;
+	clock_t start_time;
 	while (root->child.size()) {
 		Llen = 0;
+		start_time = clock();
 		outputFile();
+		printf("  outputFile tooks %d milliseconds\n", (clock() - start_time) * 1000 / CLOCKS_PER_SEC);
 
 		Llensum += Llen;
 		printf("L%d: %d (sum: %d)\n", grouplen, Llen, Llensum);
 
+		start_time = clock();
 		generateCtemp();
+		printf("  generateCtemp tooks %d milliseconds\n", (clock() - start_time) * 1000 / CLOCKS_PER_SEC);
 		if (isshowCtemp) {
 			printf("C%dtemp: %d\n", grouplen + 1, Ctemp.size());
 			printf("L%dset: %d\n", grouplen + 1, Lset.size());
 		}
 		grouplen++;
 
+		start_time = clock();
 		generateC();
+		printf("  generateC tooks %d milliseconds\n", (clock() - start_time) * 1000 / CLOCKS_PER_SEC);
 		if (isshowCits) {
 			printf("C%dits: %d\n", grouplen, Cits.size());
 		}
 
+		start_time = clock();
 		generateCsup();
+		printf("  generateCsup tooks %d milliseconds\n", (clock() - start_time) * 1000 / CLOCKS_PER_SEC);
 
+		start_time = clock();
 		generateL();
+		printf("  generateL tooks %d milliseconds\n", (clock() - start_time) * 1000 / CLOCKS_PER_SEC);
 	}
 
 	fout.close();
@@ -175,6 +187,7 @@ void Apriori::generateC() {
 void Apriori::generateCsup() {
 	Csup.clear();
 
+	clock_t start_time = clock();
 	Node *now;
 	root = new Node();
 	root->level = 0;
@@ -189,7 +202,9 @@ void Apriori::generateCsup() {
 		}
 		Csup[now] = 0;
 	}
+	printf("  createTrie tooks %d milliseconds\n", (clock() - start_time) * 1000 / CLOCKS_PER_SEC);
 
+	start_time = clock();
 	// cnt sup
 	fin.open(inputpath, std::fstream::in | std::fstream::binary);
 	if (!fin.is_open()) {
@@ -219,6 +234,7 @@ void Apriori::generateCsup() {
 		}
 	}
 	fin.close();
+	printf("  cntSup tooks %d milliseconds\n", (clock() - start_time) * 1000 / CLOCKS_PER_SEC);
 }
 
 void Apriori::dfs(Node *&now) {

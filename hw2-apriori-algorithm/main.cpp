@@ -33,8 +33,8 @@ int main(int argc, char *argv[]) {
 	clock_t start_time = clock();
 
 	Apriori apriori(inputpath, outputpath, support);
-	// apriori.showCtemp(true);
-	// apriori.showCits(true);
+	apriori.showCtemp(true);
+	apriori.showCits(true);
 	unsigned int Llensum = apriori.run();
 
 	printf("Lall: %d\n", Llensum);
