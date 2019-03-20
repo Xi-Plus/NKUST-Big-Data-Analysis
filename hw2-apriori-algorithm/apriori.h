@@ -51,7 +51,7 @@ class Apriori {
 	void outputFile();
 	void generateC();
 	void generateCsup();
-	void dfsGenerateL(Node *&now);
+	void dfsGenerateL(Node *&now, std::vector<unsigned int> item);
 	void generateL();
 };
 
