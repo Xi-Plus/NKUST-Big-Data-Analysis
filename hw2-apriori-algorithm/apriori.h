@@ -49,8 +49,6 @@ class Apriori {
 	void generateL1();
 	void dfsOutputFile(Node *&now, std::vector<unsigned int> item);
 	void outputFile();
-	void dfsGenerateCtemp(Node *&now, std::vector<unsigned int> item);
-	void generateCtemp();
 	void generateC();
 	void generateCsup();
 	void dfs(Node *&now);
