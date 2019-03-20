@@ -24,13 +24,12 @@ class Apriori {
 	// Data
 	std::unordered_map<int, int> C1;
 	std::unordered_map<Node *, int> Csup;
-	std::vector<std::vector<unsigned int>> Cits, Ctemp;
 	std::set<std::vector<unsigned int>> Lset;
 	Node *root;
 	unsigned int grouplen = 1;
 	unsigned int Llen = 0;
 	// Setting
-	bool isshowCtemp = false, isshowCits = false;
+	bool isShowDetailedTime = false;
 	// Temporary variables
 	int tempa, tempb;
 	unsigned int tempn, cnt;
@@ -39,8 +38,7 @@ class Apriori {
    public:
 	Apriori(char *_inputpath, char *_outputpath, unsigned int _support);
 	unsigned int run();
-	void showCtemp(bool setting);
-	void showCits(bool setting);
+	void showDetailedTime(bool setting);
 
    private:
 	inline unsigned int readint();
@@ -49,10 +47,12 @@ class Apriori {
 	void generateL1();
 	void dfsOutputFile(Node *&now, std::vector<unsigned int> item);
 	void outputFile();
-	void generateC();
 	void generateCsup();
 	void dfsGenerateL(Node *&now, std::vector<unsigned int> item);
 	void generateL();
+	// Debug
+	void dfsPrintTrie(Node *&now, std::vector<unsigned int> item);
+	void printTrie();
 };
 
 #endif
