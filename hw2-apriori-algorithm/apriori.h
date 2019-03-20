@@ -28,7 +28,7 @@ class Apriori {
 	std::set<std::vector<unsigned int>> Lset;
 	Node *root;
 	unsigned int grouplen = 1;
-	unsigned int Llen;
+	unsigned int Llen = 0;
 	// Setting
 	bool isshowCtemp = false, isshowCits = false;
 	// Temporary variables
