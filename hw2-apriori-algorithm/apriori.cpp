@@ -51,7 +51,7 @@ unsigned int Apriori::run() {
 		start_time = clock();
 		generateL();
 		if (isShowDetailedTime)
-			printf("  generateL, gernerateLset tooks %d milliseconds\n", (clock() - start_time) * 1000 / CLOCKS_PER_SEC);
+			printf("  generateL tooks %d milliseconds\n", (clock() - start_time) * 1000 / CLOCKS_PER_SEC);
 	}
 
 	fout.close();
@@ -85,7 +85,6 @@ void Apriori::generateC1() {
 }
 
 void Apriori::generateL1() {
-	Lset.clear();
 	Csup.clear();
 	root = new Node();
 	root->level = 0;
@@ -94,8 +93,6 @@ void Apriori::generateL1() {
 			root->child[v.first] = new Node();
 			root->child[v.first]->level = 1;
 			Csup[root->child[v.first]] = v.second;
-			// generateLset
-			Lset.insert(std::vector<unsigned int>(1, v.first));
 			// count L size
 			Llen++;
 		}
@@ -126,16 +123,25 @@ void Apriori::dfsOutputFile(Node *&now, std::vector<unsigned int> item) {
 						newitem.push_back(tempb);
 						newitem.push_back(tempa);
 					}
-					int k = 0;
-					while (k < grouplen - 2) {
+					tempc = 0;
+					while (tempc < grouplen - 2) {
 						tempv = newitem;
-						tempv.erase(tempv.begin() + k);
-						if (Lset.find(tempv) == Lset.end()) {  // https://en.cppreference.com/w/cpp/container/set/find
+						inTrie = true;
+						tempNode = root;
+						for (int l = 0; l < grouplen; l++) {
+							if (l == tempc) continue;
+							if (tempNode->child.find(newitem[l]) == tempNode->child.end()) {
+								inTrie = false;
+								break;
+							}
+							tempNode = tempNode->child[newitem[l]];
+						}
+						if (!inTrie) {
 							break;
 						}
-						k++;
+						tempc++;
 					}
-					if (k >= grouplen - 2) {
+					if (tempc >= grouplen - 2) {
 						if (tempa < tempb) {
 							i->second->child[tempb] = new Node();
 							i->second->child[tempb]->level = grouplen + 1;
@@ -209,11 +215,6 @@ void Apriori::dfsGenerateL(Node *&now, std::vector<unsigned int> item) {
 			if (Csup[next->second] < support) {
 				next = now->child.erase(next);
 			} else {
-				// generateLset
-				std::vector<unsigned int> nextitem = item;
-				nextitem.push_back(next->first);
-				Lset.insert(nextitem);
-				// count L size
 				Llen++;
 				next++;
 			}
@@ -235,8 +236,6 @@ void Apriori::dfsGenerateL(Node *&now, std::vector<unsigned int> item) {
 }
 
 void Apriori::generateL() {
-	Lset.clear();
-
 	dfsGenerateL(root, std::vector<unsigned int>());
 }
 
