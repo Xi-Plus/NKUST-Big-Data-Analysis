@@ -5,8 +5,8 @@
 #include <ctime>
 #include <fstream>
 #include <iostream>
-#include <set>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 Apriori::Apriori(char *_inputpath, char *_outputpath, unsigned int _support) {

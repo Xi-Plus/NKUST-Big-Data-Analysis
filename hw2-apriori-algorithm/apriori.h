@@ -6,8 +6,8 @@
 #include <cstring>
 #include <fstream>
 #include <iostream>
-#include <set>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 class Apriori {
@@ -15,6 +15,16 @@ class Apriori {
 	struct Node {
 		unsigned int level;
 		std::unordered_map<int, Node *> child;
+	};
+	struct vector_hash {
+		size_t operator()(const std::vector<unsigned int> &items) const {
+			std::hash<unsigned int> hasher;
+			size_t res = 0;
+			for (auto &item : items) {
+				res ^= hasher(item) + 0x9e3779b9 + (res << 4) + (res >> 5);
+			}
+			return res;
+		}
 	};
 
 	// Arguments
@@ -24,7 +34,7 @@ class Apriori {
 	// Data
 	std::unordered_map<int, int> C1;
 	std::unordered_map<Node *, int> Csup;
-	std::set<std::vector<unsigned int>> Lset;
+	std::unordered_set<std::vector<unsigned int>, vector_hash> Lset;
 	Node *root;
 	int grouplen = 1;
 	unsigned int Llen = 0;
