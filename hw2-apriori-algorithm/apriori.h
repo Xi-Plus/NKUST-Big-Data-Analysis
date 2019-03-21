@@ -16,6 +16,16 @@ class Apriori {
 		unsigned int level;
 		std::unordered_map<int, Node *> child;
 	};
+	struct vector_hash {
+		size_t operator()(const std::vector<unsigned int> &items) const {
+			std::hash<unsigned int> hasher;
+			size_t res = 0;
+			for (auto &item : items) {
+				res ^= hasher(item) + 0x9e3779b9 + (res << 4) + (res >> 5);
+			}
+			return res;
+		}
+	};
 
 	// Arguments
 	char inputpath[100], outputpath[100];
@@ -24,7 +34,8 @@ class Apriori {
 	// Data
 	std::unordered_map<int, int> C1;
 	std::unordered_map<Node *, int> Csup;
-	std::vector<std::vector<unsigned int>> Cits;
+	std::vector<std::vector<unsigned int>> Ctemp, Cits;
+	std::unordered_set<std::vector<unsigned int>, vector_hash> Lset;
 	Node *root;
 	int grouplen = 1;
 	unsigned int Llen = 0;
@@ -49,6 +60,7 @@ class Apriori {
 	void generateL1();
 	void dfsOutputFile(Node *&now, std::vector<unsigned int> item);
 	void outputFile();
+	void generateC();
 	void generateCsup();
 	void dfsGenerateL(Node *&now, std::vector<unsigned int> item);
 	void generateL();

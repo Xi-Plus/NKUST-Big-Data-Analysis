@@ -43,6 +43,12 @@ unsigned int Apriori::run() {
 		grouplen++;
 
 		start_time = clock();
+		generateC();
+		printf("  generateC tooks %d milliseconds\n", (clock() - start_time) * 1000 / CLOCKS_PER_SEC);
+		if (isShowDetailedTime)
+			printf("C%dits: %d\n", grouplen, Cits.size());
+
+		start_time = clock();
 		generateCsup();
 		if (isShowDetailedTime)
 			printf("  generateCsup tooks %d milliseconds\n", (clock() - start_time) * 1000 / CLOCKS_PER_SEC);
@@ -93,6 +99,8 @@ void Apriori::generateL1() {
 			root->child[v.first] = new Node();
 			root->child[v.first]->level = 1;
 			Csup[root->child[v.first]] = v.second;
+			// generateLset
+			Lset.insert(std::vector<unsigned int>(1, v.first));
 			// count L size
 			Llen++;
 		}
@@ -113,37 +121,12 @@ void Apriori::dfsOutputFile(Node *&now, std::vector<unsigned int> item) {
 		if (now->child.size() >= 2) {
 			for (auto i = now->child.begin(); i != now->child.end(); i++) {
 				for (auto j = std::next(i, 1); j != now->child.end(); j++) {
-					std::vector<unsigned int> newitem = item;
+					Ctemp.push_back(item);
 					tempa = i->first;
 					tempb = j->first;
-					if (tempa < tempb) {
-						newitem.push_back(tempa);
-						newitem.push_back(tempb);
-					} else {
-						newitem.push_back(tempb);
-						newitem.push_back(tempa);
-					}
-					tempc = 0;
-					while (tempc < grouplen - 2) {
-						tempv = newitem;
-						inTrie = true;
-						tempNode = root;
-						for (int l = 0; l < grouplen; l++) {
-							if (l == tempc) continue;
-							if (tempNode->child.find(newitem[l]) == tempNode->child.end()) {
-								inTrie = false;
-								break;
-							}
-							tempNode = tempNode->child[newitem[l]];
-						}
-						if (!inTrie) {
-							break;
-						}
-						tempc++;
-					}
-					if (tempc >= grouplen - 2) {
-						Cits.push_back(newitem);
-					}
+					if (tempa > tempb) std::swap(tempa, tempb);
+					Ctemp[Ctemp.size() - 1].push_back(tempa);
+					Ctemp[Ctemp.size() - 1].push_back(tempb);
 				}
 			}
 		}
@@ -158,9 +141,27 @@ void Apriori::dfsOutputFile(Node *&now, std::vector<unsigned int> item) {
 }
 
 void Apriori::outputFile() {
-	Cits.clear();
+	Ctemp.clear();
 
 	dfsOutputFile(root, std::vector<unsigned int>());
+}
+
+void Apriori::generateC() {
+	Cits.clear();
+	for (auto &itemset : Ctemp) {
+		int i = 0;
+		while (i < grouplen) {
+			tempv = itemset;
+			tempv.erase(tempv.begin() + i);
+			if (Lset.find(tempv) == Lset.end()) {
+				break;
+			}
+			i++;
+		}
+		if (i == grouplen) {
+			Cits.push_back(itemset);
+		}
+	}
 }
 
 void Apriori::generateCsup() {
@@ -226,6 +227,11 @@ void Apriori::dfsGenerateL(Node *&now, std::vector<unsigned int> item) {
 			if (Csup[next->second] < support) {
 				next = now->child.erase(next);
 			} else {
+				// generateLset
+				std::vector<unsigned int> nextitem = item;
+				nextitem.push_back(next->first);
+				Lset.insert(nextitem);
+				// count L size
 				Llen++;
 				next++;
 			}
