@@ -126,8 +126,8 @@ void Apriori::dfsOutputFile(Node *&now, std::vector<unsigned int> item) {
 						newitem.push_back(tempb);
 						newitem.push_back(tempa);
 					}
-					unsigned int k = 0;
-					while (k < grouplen) {
+					int k = 0;
+					while (k < grouplen - 2) {
 						tempv = newitem;
 						tempv.erase(tempv.begin() + k);
 						if (Lset.find(tempv) == Lset.end()) {  // https://en.cppreference.com/w/cpp/container/set/find
@@ -135,7 +135,7 @@ void Apriori::dfsOutputFile(Node *&now, std::vector<unsigned int> item) {
 						}
 						k++;
 					}
-					if (k == grouplen) {
+					if (k >= grouplen - 2) {
 						if (tempa < tempb) {
 							i->second->child[tempb] = new Node();
 							i->second->child[tempb]->level = grouplen + 1;

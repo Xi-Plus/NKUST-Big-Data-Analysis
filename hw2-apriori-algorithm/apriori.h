@@ -26,7 +26,7 @@ class Apriori {
 	std::unordered_map<Node *, int> Csup;
 	std::set<std::vector<unsigned int>> Lset;
 	Node *root;
-	unsigned int grouplen = 1;
+	int grouplen = 1;
 	unsigned int Llen = 0;
 	// Setting
 	bool isShowDetailedTime = false;
