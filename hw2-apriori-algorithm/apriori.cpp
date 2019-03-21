@@ -185,22 +185,24 @@ void Apriori::generateCsup() {
 		exit(1);
 	}
 	unsigned int cnt;
-	std::vector<Node *> nownode;
+	std::unordered_map<unsigned int, std::vector<Node *>> nownode;
 	while (true) {
 		tempn = readint();
 		if (fin.eof()) break;
 		readint();
 		cnt = readint();
 		nownode.clear();
-		nownode.push_back(root);
+		for (auto &node : root->child) {
+			nownode[node.first].push_back(node.second);
+		}
 		while (cnt--) {
 			tempn = readint();
-			for (int i = nownode.size() - 1; i >= 0; i--) {
-				if (nownode[i]->child.find(tempn) != nownode[i]->child.end()) {
-					if (nownode[i]->child[tempn]->level == grouplen) {
-						Csup[nownode[i]->child[tempn]]++;
-					} else {
-						nownode.push_back(nownode[i]->child[tempn]);
+			for (int i = nownode[tempn].size() - 1; i >= 0; i--) {
+				if (nownode[tempn][i]->level == grouplen) {
+					Csup[nownode[tempn][i]]++;
+				} else {
+					for (auto &node : nownode[tempn][i]->child) {
+						nownode[node.first].push_back(node.second);
 					}
 				}
 			}
