@@ -24,6 +24,7 @@ class Apriori {
 	// Data
 	std::unordered_map<int, int> C1;
 	std::unordered_map<Node *, int> Csup;
+	std::vector<std::vector<unsigned int>> Cits;
 	Node *root;
 	int grouplen = 1;
 	unsigned int Llen = 0;
@@ -48,6 +49,7 @@ class Apriori {
 	void generateL1();
 	void dfsOutputFile(Node *&now, std::vector<unsigned int> item);
 	void outputFile();
+	void generateC();
 	void generateCsup();
 	void dfsGenerateL(Node *&now, std::vector<unsigned int> item);
 	void generateL();

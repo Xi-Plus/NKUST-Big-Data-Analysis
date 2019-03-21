@@ -35,7 +35,7 @@ unsigned int Apriori::run() {
 		start_time = clock();
 		outputFile();
 		if (isShowDetailedTime)
-			printf("  outputFile, generateC tooks %d milliseconds\n", (clock() - start_time) * 1000 / CLOCKS_PER_SEC);
+			printf("  outputFile, generateCits tooks %d milliseconds\n", (clock() - start_time) * 1000 / CLOCKS_PER_SEC);
 
 		Llensum += Llen;
 		printf("L%d: %d (sum: %d)\n", grouplen, Llen, Llensum);
@@ -109,7 +109,7 @@ void Apriori::dfsOutputFile(Node *&now, std::vector<unsigned int> item) {
 		fout << ":" << Csup[now] << "\n";
 		return;
 	} else if (now->level == grouplen - 1) {
-		// generateC
+		// generateCits
 		if (now->child.size() >= 2) {
 			for (auto i = now->child.begin(); i != now->child.end(); i++) {
 				for (auto j = std::next(i, 1); j != now->child.end(); j++) {
@@ -142,13 +142,7 @@ void Apriori::dfsOutputFile(Node *&now, std::vector<unsigned int> item) {
 						tempc++;
 					}
 					if (tempc >= grouplen - 2) {
-						if (tempa < tempb) {
-							i->second->child[tempb] = new Node();
-							i->second->child[tempb]->level = grouplen + 1;
-						} else {
-							j->second->child[tempa] = new Node();
-							j->second->child[tempa]->level = grouplen + 1;
-						}
+						Cits.push_back(newitem);
 					}
 				}
 			}
@@ -161,24 +155,37 @@ void Apriori::dfsOutputFile(Node *&now, std::vector<unsigned int> item) {
 			dfsOutputFile(next.second, nextitem);
 		}
 	}
-	if (now->level < grouplen - 1) {
-		for (auto it = now->child.begin(); it != now->child.end();) {
-			if (it->second->child.size() == 0) {
-				it = now->child.erase(it);
-			} else {
-				it++;
-			}
-		}
-	}
 }
 
 void Apriori::outputFile() {
+	Cits.clear();
+
 	dfsOutputFile(root, std::vector<unsigned int>());
 }
 
 void Apriori::generateCsup() {
 	Csup.clear();
 
+	clock_t start_time = clock();
+	Node *now;
+	root = new Node();
+	root->level = 0;
+	for (auto &item : Cits) {
+		now = root;
+		for (int j = 0; j < grouplen; j++) {
+			if (now->child.find(item[j]) == now->child.end()) {
+				now->child[item[j]] = new Node();
+				now->child[item[j]]->level = j + 1;
+			}
+			now = now->child[item[j]];
+		}
+		Csup[now] = 0;
+	}
+	if (isShowDetailedTime)
+		printf("  createTrie tooks %d milliseconds\n", (clock() - start_time) * 1000 / CLOCKS_PER_SEC);
+
+	start_time = clock();
+	// cnt sup
 	fin.open(inputpath, std::fstream::in | std::fstream::binary);
 	if (!fin.is_open()) {
 		std::cerr << "Fail to open input file";
@@ -209,6 +216,8 @@ void Apriori::generateCsup() {
 		}
 	}
 	fin.close();
+	if (isShowDetailedTime)
+		printf("  cntSup tooks %d milliseconds\n", (clock() - start_time) * 1000 / CLOCKS_PER_SEC);
 }
 
 void Apriori::dfsGenerateL(Node *&now, std::vector<unsigned int> item) {
