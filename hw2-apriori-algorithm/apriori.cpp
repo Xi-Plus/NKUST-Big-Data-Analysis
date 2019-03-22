@@ -92,6 +92,7 @@ void Apriori::generateC1() {
 
 void Apriori::generateL1() {
 	Csup.clear();
+	Lset.clear();
 	root = new Node();
 	root->level = 0;
 	for (auto &v : C1) {
@@ -253,6 +254,8 @@ void Apriori::dfsGenerateL(Node *&now, std::vector<unsigned int> item) {
 }
 
 void Apriori::generateL() {
+	Lset.clear();
+
 	dfsGenerateL(root, std::vector<unsigned int>());
 }
 
