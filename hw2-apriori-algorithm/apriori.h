@@ -41,6 +41,8 @@ class Apriori {
 	unsigned int Llen = 0;
 	// Setting
 	bool isShowDetailedTime = false;
+	unsigned int CtempMin = 3;
+	unsigned int CtempMax = 3;
 	// Temporary variables
 	int tempa, tempb, tempc;
 	unsigned int tempn, cnt;

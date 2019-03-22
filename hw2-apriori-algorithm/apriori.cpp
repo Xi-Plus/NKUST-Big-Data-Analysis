@@ -35,7 +35,7 @@ unsigned int Apriori::run() {
 		start_time = clock();
 		outputFile();
 		if (isShowDetailedTime)
-			printf("  outputFile, generateCits tooks %d milliseconds\n", (clock() - start_time) * 1000 / CLOCKS_PER_SEC);
+			printf("  outputFile, generateCtemp tooks %d milliseconds\n", (clock() - start_time) * 1000 / CLOCKS_PER_SEC);
 
 		Llensum += Llen;
 		printf("L%d: %d (sum: %d)\n", grouplen, Llen, Llensum);
@@ -100,8 +100,6 @@ void Apriori::generateL1() {
 			root->child[v.first] = new Node();
 			root->child[v.first]->level = 1;
 			Csup[root->child[v.first]] = v.second;
-			// generateLset
-			Lset.insert(std::vector<unsigned int>(1, v.first));
 			// count L size
 			Llen++;
 		}
@@ -148,6 +146,10 @@ void Apriori::outputFile() {
 }
 
 void Apriori::generateC() {
+	if (grouplen == 2 || grouplen < CtempMin || CtempMax < grouplen) {
+		Cits = Ctemp;
+		return;
+	}
 	Cits.clear();
 	for (auto &itemset : Ctemp) {
 		int i = 0;
@@ -229,9 +231,11 @@ void Apriori::dfsGenerateL(Node *&now, std::vector<unsigned int> item) {
 				next = now->child.erase(next);
 			} else {
 				// generateLset
-				std::vector<unsigned int> nextitem = item;
-				nextitem.push_back(next->first);
-				Lset.insert(nextitem);
+				if (CtempMin <= grouplen + 1 && grouplen + 1 <= CtempMax) {
+					std::vector<unsigned int> nextitem = item;
+					nextitem.push_back(next->first);
+					Lset.insert(nextitem);
+				}
 				// count L size
 				Llen++;
 				next++;
@@ -254,7 +258,9 @@ void Apriori::dfsGenerateL(Node *&now, std::vector<unsigned int> item) {
 }
 
 void Apriori::generateL() {
-	Lset.clear();
+	if (CtempMin <= grouplen + 1 && grouplen + 1 <= CtempMax) {
+		Lset.clear();
+	}
 
 	dfsGenerateL(root, std::vector<unsigned int>());
 }
