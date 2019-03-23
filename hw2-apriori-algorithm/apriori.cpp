@@ -9,6 +9,8 @@
 #include <unordered_set>
 #include <vector>
 
+// #define COUNTING_CATEGORY
+
 Apriori::Apriori(char *_inputpath, char *_outputpath, unsigned int _support) {
 	strcpy(inputpath, _inputpath);
 	strcpy(outputpath, _outputpath);
@@ -196,18 +198,27 @@ void Apriori::generateCsup() {
 		exit(1);
 	}
 	unsigned int cnt;
+#ifdef COUNTING_CATEGORY
 	std::unordered_map<unsigned int, std::vector<Node *>> nownode;
+#else
+	std::vector<Node *> nownode;
+#endif
 	while (true) {
 		tempn = readint();
 		if (fin.eof()) break;
 		readint();
 		cnt = readint();
 		nownode.clear();
+#ifdef COUNTING_CATEGORY
 		for (auto &node : root->child) {
 			nownode[node.first].push_back(node.second);
 		}
+#else
+		nownode.push_back(root);
+#endif
 		while (cnt--) {
 			tempn = readint();
+#ifdef COUNTING_CATEGORY
 			for (int i = nownode[tempn].size() - 1; i >= 0; i--) {
 				if (nownode[tempn][i]->level == grouplen) {
 					Csup[nownode[tempn][i]]++;
@@ -217,6 +228,17 @@ void Apriori::generateCsup() {
 					}
 				}
 			}
+#else
+			for (int i = nownode.size() - 1; i >= 0; i--) {
+				if (nownode[i]->child.find(tempn) != nownode[i]->child.end()) {
+					if (nownode[i]->child[tempn]->level == grouplen) {
+						Csup[nownode[i]->child[tempn]]++;
+					} else {
+						nownode.push_back(nownode[i]->child[tempn]);
+					}
+				}
+			}
+#endif
 		}
 	}
 	fin.close();
