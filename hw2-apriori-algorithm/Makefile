@@ -4,16 +4,16 @@ SANDBOX = /var/local/lib/isolate/0
 all: 1
 
 main.exe: apriori.o main.o
-	g++ -o main apriori.o main.o -lstdc++ -std=c++11 -O3
+	g++ -o main apriori.o main.o -lstdc++ -std=c++11 -O3 -static-libstdc++
 
 apriori.o: apriori.cpp apriori.h
-	g++ -c apriori.cpp -std=c++11 -O3
+	g++ -c apriori.cpp -std=c++11 -O3 -static-libstdc++
 
 main.o: main.cpp
-	g++ -c main.cpp -std=c++11 -O3
+	g++ -c main.cpp -std=c++11 -O3 -static-libstdc++
 
 main: apriori.o main.o
-	g++ -o main apriori.o main.o -lstdc++ -std=c++11 -O3
+	g++ -o main apriori.o main.o -lstdc++ -std=c++11 -O3 -static-libstdc++
 
 0: main.exe
 	main.exe data/small.data data/small-out.txt 2
