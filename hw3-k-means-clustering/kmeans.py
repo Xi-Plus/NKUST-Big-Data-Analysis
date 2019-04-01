@@ -8,6 +8,9 @@ import numpy as np
 
 
 class KMeans():
+    limit = 0
+    allimg = False
+
     def __init__(self, k):
         self.set_k(k)
 
@@ -45,10 +48,18 @@ class KMeans():
     def calc_group_center(self, group):
         return [np.mean(np.array(list(map(self.index_to_color, group[i]))), axis=0) for i in range(self.k)]
 
+    def gen_img(self, height, width, oldgroup, centers):
+        newimg = np.empty((height, width, 3), dtype=np.uint8)
+        for i in range(self.k):
+            for item in oldgroup[i]:
+                newimg[item] = centers[i]
+        return newimg
+
     def run(self, inputpath):
         filename = os.path.splitext(inputpath)[0]
-        if not os.path.exists(filename):
-            os.makedirs(filename)
+        if self.allimg:
+            if not os.path.exists(filename):
+                os.makedirs(filename)
         img = cv2.imread(inputpath, cv2.IMREAD_UNCHANGED)
         self.img = img
         height, width, _ = img.shape
@@ -66,17 +77,25 @@ class KMeans():
             logging.info('step %s', step)
             centers = self.calc_group_center(oldgroup)
             logging.info('centers %s', centers)
-            newimg = np.empty((height, width, 3), dtype=np.uint8)
-            for i in range(self.k):
-                for item in oldgroup[i]:
-                    # print(i, item)
-                    newimg[item] = centers[i]
-                    pass
-            cv2.imwrite(
-                '{0}/{0}-{1}.jpg'.format(filename, step), newimg)
+
+            if self.allimg:
+                newimg = self.gen_img(height, width, oldgroup, centers)
+                cv2.imwrite(
+                    '{0}/{0}-{1}.jpg'.format(filename, step), newimg)
 
             newgroup = self.cluster(centers)
             if oldgroup == newgroup:
+                if not self.allimg:
+                    newimg = self.gen_img(height, width, oldgroup, centers)
+                    cv2.imwrite(
+                        '{0}-{1}.jpg'.format(filename, step), newimg)
+                break
+
+            if self.limit != 0 and step >= self.limit:
+                if not self.allimg:
+                    newimg = self.gen_img(height, width, oldgroup, centers)
+                    cv2.imwrite(
+                        '{0}-{1}.jpg'.format(filename, step), newimg)
                 break
 
             oldgroup = newgroup
@@ -89,9 +108,13 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('input', nargs='?', default='img.jpg')
-    parser.add_argument('k', nargs='?', type=int, default=5)
+    parser.add_argument('--k', type=int, default=5)
+    parser.add_argument('--limit', default=0)
+    parser.add_argument('--allimg', type=bool, default=False)
     args = parser.parse_args()
     print(args)
 
     kmeans = KMeans(args.k)
+    kmeans.limit = args.limit
+    kmeans.allimg = args.allimg
     kmeans.run(args.input)
