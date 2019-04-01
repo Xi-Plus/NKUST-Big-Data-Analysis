@@ -1,6 +1,7 @@
 import argparse
 import os
 import random
+import logging
 
 import cv2
 import numpy as np
@@ -45,10 +46,14 @@ class KMeans():
         return [np.mean(np.array(list(map(self.index_to_color, group[i]))), axis=0) for i in range(self.k)]
 
     def run(self, inputpath):
+        filename = os.path.splitext(inputpath)[0]
+        if not os.path.exists(filename):
+            os.makedirs(filename)
         img = cv2.imread(inputpath, cv2.IMREAD_UNCHANGED)
         self.img = img
         height, width, _ = img.shape
-        print(height, width, height * width)
+        logging.info('size %s %s %s', height, width, height * width)
+
         centers = []
         while len(centers) < self.k:
             h = random.randint(0, height - 1)
@@ -58,16 +63,17 @@ class KMeans():
         oldgroup = self.cluster(centers)
         step = 1
         while True:
-            print('step', step)
+            logging.info('step %s', step)
             centers = self.calc_group_center(oldgroup)
-            print('centers', centers)
+            logging.info('centers %s', centers)
             newimg = np.empty((height, width, 3), dtype=np.uint8)
             for i in range(self.k):
                 for item in oldgroup[i]:
                     # print(i, item)
                     newimg[item] = centers[i]
                     pass
-            cv2.imwrite('{0}-{1}.jpg'.format(os.path.splitext(inputpath)[0], step), newimg)
+            cv2.imwrite(
+                '{0}/{0}-{1}.jpg'.format(filename, step), newimg)
 
             newgroup = self.cluster(centers)
             if oldgroup == newgroup:
@@ -78,6 +84,9 @@ class KMeans():
 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO,
+                        format='%(asctime)s %(levelname)s %(message)s')
+
     parser = argparse.ArgumentParser()
     parser.add_argument('input', nargs='?', default='img.jpg')
     parser.add_argument('k', nargs='?', type=int, default=5)
