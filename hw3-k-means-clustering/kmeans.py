@@ -109,7 +109,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('input', nargs='?', default='img.jpg')
     parser.add_argument('--k', type=int, default=5)
-    parser.add_argument('--limit', default=0)
+    parser.add_argument('--limit', type=int, default=0)
     parser.add_argument('--allimg', type=bool, default=False)
     args = parser.parse_args()
     print(args)
