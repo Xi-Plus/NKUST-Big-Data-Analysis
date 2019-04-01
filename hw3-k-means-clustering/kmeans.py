@@ -1,7 +1,8 @@
 import argparse
+import logging
 import os
 import random
-import logging
+import time
 
 import cv2
 import numpy as np
@@ -56,6 +57,8 @@ class KMeans():
         return newimg
 
     def run(self, inputpath):
+        starttime = time.time()
+
         filename = os.path.splitext(inputpath)[0]
         if self.allimg:
             if not os.path.exists(filename):
@@ -100,6 +103,10 @@ class KMeans():
 
             oldgroup = newgroup
             step += 1
+
+        spendtime = time.time() - starttime
+        logging.info('It tooks %s seconds. %s seconds per step.',
+                     spendtime, spendtime / step)
 
 
 if __name__ == '__main__':
