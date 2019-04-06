@@ -8,8 +8,10 @@ import numpy as np
 
 
 class DBSCAN:
-    img = None
     NOISE = -1
+    img = None
+    height = None
+    width = None
 
     def __init__(self, eps, minPts):
         self.eps = eps
@@ -26,7 +28,7 @@ class DBSCAN:
     def _get_neighbors(self, h, w):
         y, x = np.ogrid[-h:self.height - h, -w:self.width - w]
         mask = x * x + y * y <= self.eps * self.eps
-        return np.where((mask == True) & (self.img < 128))
+        return np.where(mask & (self.img < 128))
 
     def run(self, inputpath):
         logging.info('Runing on %s', inputpath)
@@ -56,6 +58,7 @@ class DBSCAN:
                 group_cnt += 1
 
                 label[neighbors] = group_cnt
+                used[neighbors] = 1
 
                 queue = list(zip(neighbors[0], neighbors[1]))
                 # print(queue)
@@ -66,17 +69,16 @@ class DBSCAN:
                         label[h2, w2] = group_cnt
                         continue
                     # logging.info('\t%s %s', (h2, w2), label[h2, w2])
-                    if used[h2, w2]:
-                        continue
                     label[h2, w2] = group_cnt
-                    used[h2, w2] = 1
                     neighbors = self._get_neighbors(h2, w2)
                     # logging.info('\t%s find %s neighbors', (h2, w2), len(neighbors[0]))
                     if len(neighbors[0]) >= self.minPts:
-                        label[neighbors] = group_cnt
+                        for h3, w3 in list(zip(neighbors[0], neighbors[1])):
+                            if not used[h3, w3]:
+                                queue.append((h3, w3))
+                                used[h3, w3] = 1
                         # logging.info('====== %s find %s neighbors: %s',
                         #              (h, w), len(neighbors[0]), neighbors)
-                        queue.extend(list(zip(neighbors[0], neighbors[1])))
         logging.info('Find %s groups', group_cnt)
 
         newimg = np.zeros((self.height, self.width, 3), dtype=np.uint8)
