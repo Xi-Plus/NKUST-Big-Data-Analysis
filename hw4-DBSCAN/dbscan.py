@@ -16,6 +16,7 @@ class DBSCAN:
     def __init__(self, eps, minPts):
         self.eps = eps
         self.minPts = minPts
+        self.mask = self._get_mask(eps)
 
     def _randomcolor(self):
         r = g = b = 0
@@ -26,9 +27,22 @@ class DBSCAN:
         return (r, g, b)
 
     def _get_neighbors(self, h, w):
-        y, x = np.ogrid[-h:self.height - h, -w:self.width - w]
-        mask = x * x + y * y <= self.eps * self.eps
-        return np.where(mask & (self.img < 128))
+        res = ([], [])
+        for dh, dw in self.mask:
+            nh = h + dh
+            nw = w + dw
+            if nh < 0 or nh >= self.height or nw < 0 or nw > self.width:
+                continue
+            if self.img[nh, nw] < 128:
+                res[0].append(nh)
+                res[1].append(nw)
+        return res
+
+    def _get_mask(self, eps):
+        y, x = np.ogrid[-eps:eps + 1, -eps:eps + 1]
+        mask = x * x + y * y <= eps * eps
+        idx = np.where(mask)
+        return np.array(list(zip(idx[0], idx[1]))) - (eps, eps)
 
     def run(self, inputpath):
         logging.info('Runing on %s', inputpath)
@@ -57,7 +71,7 @@ class DBSCAN:
 
                 group_cnt += 1
 
-                label[neighbors] = group_cnt
+                label[h, w] = group_cnt
                 used[neighbors] = 1
 
                 queue = list(zip(neighbors[0], neighbors[1]))
@@ -67,6 +81,8 @@ class DBSCAN:
                     h2, w2 = queue.pop(0)
                     if label[h2, w2] == self.NOISE:
                         label[h2, w2] = group_cnt
+                        continue
+                    if label[h2, w2] != 0:
                         continue
                     # logging.info('\t%s %s', (h2, w2), label[h2, w2])
                     label[h2, w2] = group_cnt
