@@ -63,8 +63,8 @@ class DBSCAN:
                 if img[h, w] > 128:
                     continue
                 neighbors = self._get_neighbors(h, w)
-                logging.info('%s find %s neighbors',
-                             (h, w), len(neighbors[0]))
+                logging.debug('%s find %s neighbors',
+                              (h, w), len(neighbors[0]))
                 if len(neighbors[0]) < self.minPts:
                     label[neighbors] = self.NOISE
                     continue
@@ -96,11 +96,15 @@ class DBSCAN:
                         # logging.info('====== %s find %s neighbors: %s',
                         #              (h, w), len(neighbors[0]), neighbors)
         logging.info('Find %s groups', group_cnt)
+        noices = np.where(label == self.NOISE)
+        logging.info('%s noises', len(noices[0]))
 
-        newimg = np.zeros((self.height, self.width, 3), dtype=np.uint8)
+        newimg = np.full((self.height, self.width, 3),
+                         (255, 255, 255), dtype=np.uint8)
         for i in range(1, group_cnt + 1):
             color = self._randomcolor()
             newimg[np.where(label == i)] = color
+        newimg[noices] = (0, 0, 0)
         cv2.imwrite('{}-out.jpg'.format(filename), newimg)
 
         logging.info('End')
