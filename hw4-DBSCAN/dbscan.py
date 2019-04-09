@@ -109,7 +109,9 @@ class DBSCAN:
             newimg[np.where(label == i)] = color
         if self.showNoise:
             newimg[noices] = (0, 0, 0)
-        cv2.imwrite('{}-out.jpg'.format(filename), newimg)
+        cv2.imwrite('{}-out-eps{}-min{}-group{}.bmp'.format(
+            filename, self.eps, self.minPts, group_cnt
+        ), newimg)
 
         logging.info('End')
 

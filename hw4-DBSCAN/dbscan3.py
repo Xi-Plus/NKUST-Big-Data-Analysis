@@ -244,7 +244,9 @@ class DBSCAN:
 
         noices = np.where(self.label == self.NOISE)
         logging.info('%s noises', len(noices[0]))
-        cv2.imwrite('{}-out.jpg'.format(filename), newimg)
+        cv2.imwrite('{}-out-eps{}-min{}-group{}.bmp'.format(
+            filename, self.eps, self.minPts, group_cnt
+        ), newimg)
 
         logging.info('End')
 
