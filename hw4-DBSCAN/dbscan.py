@@ -59,7 +59,7 @@ class DBSCAN:
         group_cnt = 0
         for h in range(self.height):
             for w in range(self.width):
-                if label[h, w] != 0:
+                if label[h, w] > 0:
                     continue
                 if img[h, w] > 128:
                     continue
