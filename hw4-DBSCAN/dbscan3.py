@@ -91,12 +91,10 @@ class DBSCAN:
             self.disjoint_sets.append(self.new_label)
 
         for nh, nw in list(zip(neighbors[0], neighbors[1])):
-            if self.label[nh, nw] != this_label and self.label[nh, nw] > 0:
+            if self.label[nh, nw] != this_label and self.label[nh, nw] > 0 and self.core_point[nh, nw]:
                 # logging.info('Merge %s and %s',
                 #              self.label[nh, nw], this_label)
-                min_label = min(self.label[nh, nw], this_label)
-                max_label = max(self.label[nh, nw], this_label)
-                self.disjoint_sets[max_label] = min_label
+                self._merge(self.label[nh, nw], this_label)
                 continue
             self.label[nh, nw] = this_label
 
@@ -138,6 +136,8 @@ class DBSCAN:
                 self.label[h, w] = self.NOISE
             return
 
+        self.core_point[h, w] = True
+
         if self.label[h, w] > 0:
             this_label = self.label[h, w]
         else:
@@ -147,16 +147,21 @@ class DBSCAN:
             this_label = self.new_label
 
         for nh, nw in self.prevneighbors:
-            if self.label[nh, nw] != this_label and self.label[nh, nw] > 0:
+            if self.label[nh, nw] != this_label and self.label[nh, nw] > 0 and self.core_point[nh, nw]:
                 # logging.info('Merge %s and %s',
                 #              self.label[nh, nw], this_label)
-                min_label = min(self.label[nh, nw], this_label)
-                max_label = max(self.label[nh, nw], this_label)
-                self.disjoint_sets[max_label] = min_label
+                self._merge(self.label[nh, nw], this_label)
                 continue
             self.label[nh, nw] = this_label
 
         self.prevw = w
+
+    def _merge(self, x, y):
+        x_parent = self._get_parent(x)
+        y_parent = self._get_parent(y)
+        min_label = min(x_parent, y_parent)
+        max_label = max(x_parent, y_parent)
+        self.disjoint_sets[max_label] = min_label
 
     def _get_parent(self, x):
         if self.disjoint_sets[x] == x:
@@ -236,7 +241,6 @@ class DBSCAN:
 
         noices = np.where(self.label == self.NOISE)
         logging.info('%s noises', len(noices[0]))
-        newimg[noices] = (0, 0, 0)
         cv2.imwrite('{}-out.jpg'.format(filename), newimg)
 
         logging.info('End')
