@@ -12,6 +12,7 @@ class DBSCAN:
     img = None
     height = None
     width = None
+    showNoise = False
 
     def __init__(self, eps, minPts):
         self.eps = eps
@@ -106,7 +107,8 @@ class DBSCAN:
         for i in range(1, group_cnt + 1):
             color = self._randomcolor()
             newimg[np.where(label == i)] = color
-        newimg[noices] = (0, 0, 0)
+        if self.showNoise:
+            newimg[noices] = (0, 0, 0)
         cv2.imwrite('{}-out.jpg'.format(filename), newimg)
 
         logging.info('End')

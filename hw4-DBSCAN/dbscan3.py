@@ -12,6 +12,7 @@ class DBSCAN:
     img = None
     height = None
     width = None
+    showNoise = False
     mask = None
     maskadd = None
     maskremove = None
@@ -223,7 +224,9 @@ class DBSCAN:
             for w in range(self.width):
                 if img[h, w] <= 128:
                     if self.label[h, w] == self.NOISE:
-                        newimg[h, w] = (0, 0, 0)
+                        if self.showNoise:
+                            newimg[h, w] = (0, 0, 0)
+                        pass
                     else:
                         newimg[h, w] = colors[self._get_parent(
                             self.label[h, w])]
