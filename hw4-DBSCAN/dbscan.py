@@ -31,7 +31,7 @@ class DBSCAN:
         for dh, dw in self.mask:
             nh = h + dh
             nw = w + dw
-            if nh < 0 or nh >= self.height or nw < 0 or nw > self.width:
+            if nh < 0 or nh >= self.height or nw < 0 or nw >= self.width:
                 continue
             if self.img[nh, nw] < 128:
                 res[0].append(nh)
