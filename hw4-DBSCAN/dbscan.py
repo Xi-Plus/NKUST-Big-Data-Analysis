@@ -66,7 +66,9 @@ class DBSCAN:
                 logging.debug('%s find %s neighbors',
                               (h, w), len(neighbors[0]))
                 if len(neighbors[0]) < self.minPts:
-                    label[neighbors] = self.NOISE
+                    for nh, nw in list(zip(neighbors[0], neighbors[1])):
+                        if label[nh, nw] == 0:
+                            label[nh, nw] = self.NOISE
                     continue
 
                 group_cnt += 1
