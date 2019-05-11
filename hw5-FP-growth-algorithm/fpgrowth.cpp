@@ -17,19 +17,24 @@ class FPGrowth {
 		unsigned int count;
 		std::unordered_map<int, TreeNode *> child;
 		TreeNode *next = nullptr;
+		TreeNode *parent = nullptr;
+		TreeNode(unsigned int _item) {
+			item = _item;
+			count = 0;
+		}
 	};
 	struct HeaderTableNode {
 		TreeNode *start = nullptr;
 		TreeNode *end = nullptr;
 	};
-	struct vector_hash {
-		size_t operator()(const std::vector<unsigned int> &items) const {
-			std::hash<unsigned int> hasher;
-			size_t res = 0;
-			for (auto &item : items) {
-				res ^= hasher(item) + 0x9e3779b9 + (res << 4) + (res >> 5);
-			}
-			return res;
+	struct Tree {
+		std::vector<unsigned int> prefix;
+		TreeNode *tree;
+		std::vector<std::pair<unsigned int, HeaderTableNode>> header_table;
+		std::unordered_map<unsigned int, Tree *> child_tree;
+		Tree(std::vector<unsigned int> _prefix) {
+			prefix = _prefix;
+			tree = new TreeNode(-1);
 		}
 	};
 
@@ -41,7 +46,7 @@ class FPGrowth {
 	std::unordered_map<int, int> C1;
 	std::vector<std::pair<int, int>> L1;
 	std::unordered_map<unsigned int, HeaderTableNode> HeaderTable;
-	std::unordered_map<std::string, TreeNode *> root;
+	Tree *forest;
 	/*
 	std::unordered_map<Node *, int> Csup;
 	std::vector<std::vector<unsigned int>> Ctemp, Cits;
@@ -179,9 +184,8 @@ class FPGrowth {
 			exit(1);
 		}
 
-		root.clear();
-		root[""] = new TreeNode();
-		root[""]->item = -33;
+		std::vector<unsigned int> empty_tree(0, 0);
+		forest = new Tree(std::vector<unsigned int>(0, 0));
 
 		while (true) {
 			readint();
@@ -200,14 +204,12 @@ class FPGrowth {
 				}
 			}
 			std::cout << std::endl;
-			TreeNode *now = root[""];
+			TreeNode *now = forest->tree;
 			for (auto &item : L1) {
 				if (items.find(item.first) != items.end()) {
 					std::cout << (char)('a' + item.first) << std::endl;
 					if (now->child.find(item.first) == now->child.end()) {
-						now->child[item.first] = new TreeNode();
-						now->child[item.first]->count = 0;
-						now->child[item.first]->item = item.first;
+						now->child[item.first] = new TreeNode(item.first);
 						if (HeaderTable[item.first].end == nullptr) {
 							HeaderTable[item.first].start = now->child[item.first];
 							HeaderTable[item.first].end = now->child[item.first];
@@ -406,7 +408,7 @@ class FPGrowth {
 */
 	// Debug
 	void dumpTree() {
-		dfsPrintTree(root[""]);
+		dfsPrintTree(forest->tree);
 		for (auto iter = HeaderTable.begin(); iter != HeaderTable.end(); ++iter) {
 			auto now = iter->second.start;
 			while (now != nullptr && now->next != nullptr) {
