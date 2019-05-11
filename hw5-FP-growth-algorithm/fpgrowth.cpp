@@ -350,16 +350,7 @@ class FPGrowth {
 	// Debug
 	void dumpTree(Tree *tree) {
 		dfsPrintTree(tree->tree);
-		// for (auto iter = tree->header_table_pointer.begin(); iter != tree->header_table_pointer.end(); ++iter) {
-		// 	auto now = iter->second->start;
-		// 	while (now != nullptr && now->next != nullptr) {
-		// 		cout << now << "-" << _format_char(now->item) << "-" << now->count << " "
-		// 			 << now->next << "-" << _format_char(now->next->item) << "-" << now->next->count << " *"
-		// 			 << endl;
-
-		// 		now = now->next;
-		// 	}
-		// }
+		// dumpHeaderTable(tree);
 		cout << endl
 			 << "----------"
 			 << endl;
@@ -373,6 +364,24 @@ class FPGrowth {
 			} else {
 				cout << _format_char(iter->second->item) << "-" << iter->second->count << endl;
 				dfsPrintTree(iter->second);
+			}
+		}
+	}
+	void dumpHeaderTable(Tree *tree) {
+		for (auto iter = tree->header_table_pointer.begin(); iter != tree->header_table_pointer.end(); ++iter) {
+			cout << iter->second << " "
+				 << iter->second->start << "-" << _format_char(iter->second->start->item) << "-" << iter->second->start->count
+				 << " start" << endl;
+			cout << iter->second << " "
+				 << iter->second->end << "-" << _format_char(iter->second->end->item) << "-" << iter->second->end->count
+				 << " end" << endl;
+			auto now = iter->second->start;
+			while (now != nullptr && now->next != nullptr) {
+				cout << now << "-" << _format_char(now->item) << "-" << now->count << " "
+					 << now->next << "-" << _format_char(now->next->item) << "-" << now->next->count << " next"
+					 << endl;
+
+				now = now->next;
 			}
 		}
 	}
