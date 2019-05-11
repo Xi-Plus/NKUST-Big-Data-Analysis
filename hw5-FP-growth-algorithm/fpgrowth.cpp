@@ -61,6 +61,7 @@ class FPGrowth {
 	unordered_map<int, int> C1;
 	vector<pair<unsigned int, unsigned int>> L1;
 	Tree *forest;
+	unsigned int Llensum = 0;
 	/*
 	unordered_map<Node *, int> Csup;
 	vector<vector<unsigned int>> Ctemp, Cits;
@@ -97,9 +98,11 @@ class FPGrowth {
 
 		forest = new Tree(vector<unsigned int>(0, 0));
 
+		Llensum = 0;
+
 		generateC1();
 		generateL1();
-		cout << L1.size() << endl;
+		cout << "L1: " << L1.size() << endl;
 		// for (auto v : L1) {
 		// 	cout << _format_char(v.first) << ":" << v.second << endl;
 		// }
@@ -112,7 +115,6 @@ class FPGrowth {
 			buildSubTree(forest, it->first);
 		}
 
-		unsigned int Llensum = 0;
 		fout.close();
 
 		return Llensum;
@@ -301,6 +303,7 @@ class FPGrowth {
 		}
 		fout << _format_char(leafItem);
 		fout << ":" << count[leafItem] << "\n";
+		Llensum++;
 		// cout << endl;
 
 		// pruning
