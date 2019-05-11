@@ -30,7 +30,8 @@ class FPGrowth {
 	struct Tree {
 		std::vector<unsigned int> prefix;
 		TreeNode *tree;
-		std::vector<std::pair<unsigned int, HeaderTableNode>> header_table;
+		std::vector<std::pair<unsigned int, HeaderTableNode *>> header_table;
+		std::unordered_map<unsigned int, HeaderTableNode *> header_table_pointer;
 		std::unordered_map<unsigned int, Tree *> child_tree;
 		Tree(std::vector<unsigned int> _prefix) {
 			prefix = _prefix;
@@ -45,7 +46,6 @@ class FPGrowth {
 	// Data
 	std::unordered_map<int, int> C1;
 	std::vector<std::pair<int, int>> L1;
-	std::unordered_map<unsigned int, HeaderTableNode> HeaderTable;
 	Tree *forest;
 	/*
 	std::unordered_map<Node *, int> Csup;
@@ -79,6 +79,8 @@ class FPGrowth {
 			std::cerr << "Fail to open output file";
 			exit(1);
 		}
+
+		forest = new Tree(std::vector<unsigned int>(0, 0));
 
 		generateC1();
 		generateL1();
@@ -164,7 +166,6 @@ class FPGrowth {
 		for (auto &v : C1) {
 			if (v.second >= support) {
 				L1.push_back(std::make_pair(v.first, v.second));
-				HeaderTable[v.first] = HeaderTableNode();
 			}
 		}
 		sort(L1.begin(), L1.end(), L1Cmp);
@@ -175,6 +176,11 @@ class FPGrowth {
 		L1.push_back(std::make_pair(1, 3));
 		L1.push_back(std::make_pair(12, 3));
 		L1.push_back(std::make_pair(15, 3));
+		for (auto &v : L1) {
+			HeaderTableNode *htn = new HeaderTableNode();
+			forest->header_table.push_back(std::make_pair(v.first, htn));
+			forest->header_table_pointer[v.first] = htn;
+		}
 	}
 
 	void buildTree() {
@@ -183,9 +189,6 @@ class FPGrowth {
 			std::cerr << "Fail to open input file";
 			exit(1);
 		}
-
-		std::vector<unsigned int> empty_tree(0, 0);
-		forest = new Tree(std::vector<unsigned int>(0, 0));
 
 		while (true) {
 			readint();
@@ -196,7 +199,7 @@ class FPGrowth {
 			while (cnt--) {
 				tempn = readint();
 				std::cout << (char)('a' + tempn) << " ";
-				if (HeaderTable.find(tempn) != HeaderTable.end()) {
+				if (forest->header_table_pointer.find(tempn) != forest->header_table_pointer.end()) {
 					items[tempn] = true;
 					std::cout << "+ ";
 				} else {
@@ -210,12 +213,12 @@ class FPGrowth {
 					std::cout << (char)('a' + item.first) << std::endl;
 					if (now->child.find(item.first) == now->child.end()) {
 						now->child[item.first] = new TreeNode(item.first);
-						if (HeaderTable[item.first].end == nullptr) {
-							HeaderTable[item.first].start = now->child[item.first];
-							HeaderTable[item.first].end = now->child[item.first];
+						if (forest->header_table_pointer[item.first]->end == nullptr) {
+							forest->header_table_pointer[item.first]->start = now->child[item.first];
+							forest->header_table_pointer[item.first]->end = now->child[item.first];
 						} else {
-							HeaderTable[item.first].end->next = now->child[item.first];
-							HeaderTable[item.first].end = now->child[item.first];
+							forest->header_table_pointer[item.first]->end->next = now->child[item.first];
+							forest->header_table_pointer[item.first]->end = now->child[item.first];
 						}
 					}
 					now = now->child[item.first];
@@ -223,7 +226,7 @@ class FPGrowth {
 				}
 			}
 			std::cout << std::endl;
-			dumpTree();
+			dumpTree(forest);
 		}
 		fin.close();
 	}
@@ -407,10 +410,10 @@ class FPGrowth {
 	}
 */
 	// Debug
-	void dumpTree() {
-		dfsPrintTree(forest->tree);
-		for (auto iter = HeaderTable.begin(); iter != HeaderTable.end(); ++iter) {
-			auto now = iter->second.start;
+	void dumpTree(Tree* tree) {
+		dfsPrintTree(tree->tree);
+		for (auto iter = tree->header_table_pointer.begin(); iter != tree->header_table_pointer.end(); ++iter) {
+			auto now = iter->second->start;
 			while (now != nullptr && now->next != nullptr) {
 				std::cout << now << "-" << (char)('a' + now->item) << "-" << now->count << " "
 						  << now->next << "-" << (char)('a' + now->next->item) << "-" << now->next->count << " *"
