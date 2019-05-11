@@ -361,8 +361,13 @@ class FPGrowth {
 	void dfsPrintTree(TreeNode *&now) {
 		for (auto iter = now->child.begin(); iter != now->child.end(); ++iter) {
 			cout << now << "-" << _format_char(now->item) << "-" << now->count << " "
-				 << iter->second << "-" << _format_char(iter->second->item) << "-" << iter->second->count << endl;
-			dfsPrintTree(iter->second);
+				 << iter->second;
+			if (iter->second == 0) {
+				cout << 0 << "-" << 0 << endl;
+			} else {
+				cout << _format_char(iter->second->item) << "-" << iter->second->count << endl;
+				dfsPrintTree(iter->second);
+			}
 		}
 	}
 };
