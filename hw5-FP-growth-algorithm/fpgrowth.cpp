@@ -266,7 +266,7 @@ class FPGrowth {
 		unordered_map<unsigned int, unsigned int> count;
 		while (leaf != nullptr) {
 			// cout << "leaf " << leaf << endl;
-			TreeNode *now = leaf;
+			TreeNode *now = leaf->parent;
 			while (now->parent != nullptr) {
 				count[now->item] += leaf->count;
 				// cout << now << " Add " << _format_char(now->item) << " " << leaf->count << endl;
@@ -277,13 +277,11 @@ class FPGrowth {
 
 		// Output file
 		// cout << "Ouput " << count[leafItem] << endl;
-		if (count[leafItem] >= support) {
-			for (auto &v : fromTree->prefix) {
-				fout << _format_char(v) << ",";
-			}
-			fout << _format_char(leafItem);
-			fout << ":" << count[leafItem] << "\n";
+		for (auto &v : fromTree->prefix) {
+			fout << _format_char(v) << ",";
 		}
+		fout << _format_char(leafItem);
+		fout << ":" << count[leafItem] << "\n";
 		// cout << endl;
 
 		// Build next tree
