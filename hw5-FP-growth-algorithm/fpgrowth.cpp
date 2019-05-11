@@ -40,7 +40,7 @@ class FPGrowth {
 		unordered_map<unsigned int, Tree *> child_tree;
 		Tree(vector<unsigned int> _prefix) {
 			prefix = _prefix;
-			tree = new TreeNode(-1);
+			tree = new TreeNode(INT_MAX);
 		}
 		~Tree() {
 			header_table.clear();
@@ -55,7 +55,7 @@ class FPGrowth {
 	fstream fin, fout;
 	// Data
 	unordered_map<int, int> C1;
-	vector<pair<int, int>> L1;
+	vector<pair<unsigned int, unsigned int>> L1;
 	Tree *forest;
 	/*
 	unordered_map<Node *, int> Csup;
@@ -95,13 +95,15 @@ class FPGrowth {
 
 		generateC1();
 		generateL1();
-		// cout << L1.size() << endl;
+		cout << L1.size() << endl;
 		// for (auto v : L1) {
-		// 	cout << _format_char(v.first) << " " << v.second << endl;
+		// 	cout << _format_char(v.first) << ":" << v.second << endl;
 		// }
+
 		buildTree();
 
 		for (auto it = forest->header_table.rbegin(); it != forest->header_table.rend(); it++) {
+			// cout << it->first << endl;
 			buildSubTree(forest, it->first);
 		}
 
@@ -174,7 +176,7 @@ class FPGrowth {
 			exit(1);
 		}
 
-		allTreeCount++;
+		// allTreeCount++;
 
 		while (true) {
 			readint();
@@ -219,17 +221,27 @@ class FPGrowth {
 	}
 
 	void buildSubTree(Tree *fromTree, unsigned int leafItem) {
-		cout << "buildSubTree " << _format_char(leafItem);
-		cout << " Base on ";
-		for (auto v : fromTree->prefix) {
-			cout << _format_char(v) << " ";
-		}
-		cout << " " << allTreeCount << endl;
+		// cout << "buildSubTree " << _format_char(leafItem);
+		// cout << " Base on ";
+		// for (auto v : fromTree->prefix) {
+		// 	cout << _format_char(v) << " ";
+		// }
+		// cout << endl;
+
 		TreeNode *leaf = fromTree->header_table_pointer[leafItem]->start;
 
-		dumpTree(fromTree);
+		if (fromTree->prefix.size() >= 7) {
+			cout << "buildSubTree " << _format_char(leafItem);
+			cout << " Base on ";
+			for (auto v : fromTree->prefix) {
+				cout << _format_char(v) << " ";
+			}
+			cout << endl;
+			dumpTree(fromTree);
+		}
 
 		unordered_map<unsigned int, unsigned int> count;
+		int leafCnt = 0, nodeCnt = 0;
 		while (leaf != nullptr) {
 			// cout << "leaf " << leaf << endl;
 			TreeNode *now = leaf;
@@ -237,9 +249,12 @@ class FPGrowth {
 				count[now->item] += leaf->count;
 				// cout << now << " Add " << _format_char(now->item) << " " << leaf->count << endl;
 				now = now->parent;
+				nodeCnt++;
 			}
 			leaf = leaf->next;
+			leafCnt++;
 		}
+		// cout << "leafCnt " << leafCnt << " nodeCnt " << nodeCnt << endl;
 
 		// Output file
 		// cout << "Ouput " << count[leafItem] << endl;
@@ -253,12 +268,13 @@ class FPGrowth {
 		// Build next tree
 		vector<pair<unsigned int, unsigned int>> L;
 		for (auto it = count.begin(); it != count.end(); it++) {
-			// cout << _format_char(it->first) << " " << it->second << endl;
+			// cout << _format_char(it->first) << "(" << it->second << ") ";
 			if (it->second >= support && it->first != leafItem) {
 				L.push_back(make_pair(it->first, it->second));
-				// cout << "Next " << _format_char(it->first) << " " << it->second << endl;
+				// cout << "Next " << _format_char(it->first) << " " << it->second << " ";
 			}
 		}
+		// cout << endl;
 		if (L.size() == 0) {
 			// cout << "No next tree" << endl;
 			return;
@@ -267,44 +283,49 @@ class FPGrowth {
 
 		vector<unsigned int> prefix(fromTree->prefix);
 		prefix.push_back(leafItem);
-		fromTree->child_tree[leafItem] = new Tree(prefix);
-		allTreeCount++;
+		Tree *subTree = new Tree(prefix);
+		fromTree->child_tree[leafItem] = subTree;
+		// allTreeCount++;
 
-		TreeNode *now = fromTree->child_tree[leafItem]->tree;
+		TreeNode *now = subTree->tree;
 		// cout << "Build sub tree" << endl;
 		for (auto &item : L) {
-			// cout << _format_char(item.first) << endl;
+			// cout << _format_char(item.first) << " " << item.second << endl;
 			now->child[item.first] = new TreeNode(item.first);
 			now->child[item.first]->parent = now;
 
 			HeaderTableNode *htn = new HeaderTableNode();
-			fromTree->child_tree[leafItem]->header_table.push_back(make_pair(item.first, htn));
-			fromTree->child_tree[leafItem]->header_table_pointer[item.first] = htn;
-			fromTree->child_tree[leafItem]->header_table_pointer[item.first]->start = now->child[item.first];
-			fromTree->child_tree[leafItem]->header_table_pointer[item.first]->end = now->child[item.first];
+			htn->start = now->child[item.first];
+			htn->end = now->child[item.first];
+			subTree->header_table.push_back(make_pair(item.first, htn));
+			subTree->header_table_pointer[item.first] = htn;
 
 			now = now->child[item.first];
 			now->count = item.second;
-
-			dumpTree(fromTree->child_tree[leafItem]);
 		}
+
+		if (fromTree->prefix.size() >= 7) {
+			dumpTree(subTree);
+		}
+
 		// cout << endl;
 
 		for (auto it = L.rbegin(); it != L.rend(); it++) {
-			buildSubTree(fromTree->child_tree[leafItem], it->first);
+			buildSubTree(subTree, it->first);
 		}
 
 		freeTree(fromTree, leafItem);
 	}
 
 	void freeTree(Tree *fromTree, unsigned int leafItem) {
-		allTreeCount--;
-		cout << "freeTree " << _format_char(leafItem);
-		cout << " Base on ";
-		for (auto v : fromTree->prefix) {
-			cout << _format_char(v) << " ";
-		}
-		cout << " " << allTreeCount << endl;
+		// allTreeCount--;
+		// cout << "freeTree " << _format_char(leafItem);
+		// cout << " Base on ";
+		// for (auto v : fromTree->prefix) {
+		// 	cout << _format_char(v) << " ";
+		// }
+		// cout << " " << allTreeCount << endl;
+
 		free(fromTree->child_tree[leafItem]);
 	}
 
@@ -318,16 +339,16 @@ class FPGrowth {
 	// Debug
 	void dumpTree(Tree *tree) {
 		dfsPrintTree(tree->tree);
-		for (auto iter = tree->header_table_pointer.begin(); iter != tree->header_table_pointer.end(); ++iter) {
-			auto now = iter->second->start;
-			while (now != nullptr && now->next != nullptr) {
-				cout << now << "-" << _format_char(now->item) << "-" << now->count << " "
-					 << now->next << "-" << _format_char(now->next->item) << "-" << now->next->count << " *"
-					 << endl;
+		// for (auto iter = tree->header_table_pointer.begin(); iter != tree->header_table_pointer.end(); ++iter) {
+		// 	auto now = iter->second->start;
+		// 	while (now != nullptr && now->next != nullptr) {
+		// 		cout << now << "-" << _format_char(now->item) << "-" << now->count << " "
+		// 			 << now->next << "-" << _format_char(now->next->item) << "-" << now->next->count << " *"
+		// 			 << endl;
 
-				now = now->next;
-			}
-		}
+		// 		now = now->next;
+		// 	}
+		// }
 		cout << endl
 			 << "----------"
 			 << endl;
