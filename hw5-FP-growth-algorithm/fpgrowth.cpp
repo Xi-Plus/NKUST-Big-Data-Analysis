@@ -236,6 +236,9 @@ class FPGrowth {
 	}
 
 	void pruning(Tree *tree, unsigned int item) {
+		if (tree->header_table_pointer.find(item) == tree->header_table_pointer.end()) {
+			return;
+		}
 		TreeNode *node = tree->header_table_pointer[item]->start;
 		while (node != nullptr) {
 			node->child.clear();
