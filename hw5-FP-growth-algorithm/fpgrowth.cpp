@@ -289,6 +289,15 @@ class FPGrowth {
 		fout << ":" << count[leafItem] << "\n";
 		// cout << endl;
 
+		// pruning
+		for (auto it = count.begin(); it != count.end(); it++) {
+			if (it->second < support) {
+				cout << "pruning " << _format_char(it->first) << "(" << it->second << ")" << endl;
+				pruning(subTree, it->first);
+				// cout << "Next " << _format_char(it->first) << " " << it->second << " ";
+			}
+		}
+
 		// Build next tree
 		vector<pair<unsigned int, unsigned int>> L;
 		for (auto it = count.begin(); it != count.end(); it++) {
