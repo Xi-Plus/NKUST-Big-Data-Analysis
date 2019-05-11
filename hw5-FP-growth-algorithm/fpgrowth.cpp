@@ -24,6 +24,10 @@ class FPGrowth {
 			item = _item;
 			count = 0;
 		}
+		TreeNode(unsigned int _item, unsigned int _count) {
+			item = _item;
+			count = _count;
+		}
 		~TreeNode() {
 			child.clear();
 		}
@@ -199,25 +203,30 @@ class FPGrowth {
 			for (auto &item : L1) {
 				if (items.find(item.first) != items.end()) {
 					// cout << _format_char(item.first) << endl;
-					if (now->child.find(item.first) == now->child.end()) {
-						now->child[item.first] = new TreeNode(item.first);
-						now->child[item.first]->parent = now;
-						if (forest->header_table_pointer[item.first]->end == nullptr) {
-							forest->header_table_pointer[item.first]->start = now->child[item.first];
-							forest->header_table_pointer[item.first]->end = now->child[item.first];
-						} else {
-							forest->header_table_pointer[item.first]->end->next = now->child[item.first];
-							forest->header_table_pointer[item.first]->end = now->child[item.first];
-						}
-					}
-					now = now->child[item.first];
-					now->count++;
+					now = addItemToTreeNode(forest, now, item.first);
 				}
 			}
 			// cout << endl;
 			// dumpTree(forest);
 		}
 		fin.close();
+	}
+
+	TreeNode *addItemToTreeNode(Tree *tree, TreeNode *treeNode, unsigned int item, unsigned int count = 1) {
+		if (treeNode->child.find(item) == treeNode->child.end()) {
+			treeNode->child[item] = new TreeNode(item, count);
+			treeNode->child[item]->parent = treeNode;
+			if (tree->header_table_pointer[item]->end == nullptr) {
+				tree->header_table_pointer[item]->start = treeNode->child[item];
+				tree->header_table_pointer[item]->end = treeNode->child[item];
+			} else {
+				tree->header_table_pointer[item]->end->next = treeNode->child[item];
+				tree->header_table_pointer[item]->end = treeNode->child[item];
+			}
+		} else {
+			treeNode->child[item]->count += count;
+		}
+		return treeNode->child[item];
 	}
 
 	void buildSubTree(Tree *fromTree, unsigned int leafItem) {
