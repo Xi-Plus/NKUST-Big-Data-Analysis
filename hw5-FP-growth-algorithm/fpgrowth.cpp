@@ -232,6 +232,18 @@ class FPGrowth {
 		return treeNode->child[item];
 	}
 
+	void pruning(Tree *tree, unsigned int item) {
+		TreeNode *node = tree->header_table_pointer[item]->start;
+		while (node != nullptr) {
+			node->child.clear();
+			node->parent->child[node->item] = nullptr;
+			auto toDel = node;
+			node = node->next;
+			free(toDel);
+		}
+		tree->header_table_pointer.erase(item);
+	}
+
 	void buildSubTree(Tree *fromTree, unsigned int leafItem) {
 		// cout << "buildSubTree " << _format_char(leafItem);
 		// cout << " Base on ";
