@@ -226,9 +226,6 @@ class FPGrowth {
 		}
 		cout << " " << allTreeCount << endl;
 		TreeNode *leaf = fromTree->header_table_pointer[leafItem]->start;
-		if (leaf == nullptr) {
-			return;
-		}
 
 		dumpTree(fromTree);
 
