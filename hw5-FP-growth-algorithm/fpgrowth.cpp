@@ -216,6 +216,9 @@ class FPGrowth {
 		if (treeNode->child.find(item) == treeNode->child.end()) {
 			treeNode->child[item] = new TreeNode(item, count);
 			treeNode->child[item]->parent = treeNode;
+			if (tree->header_table_pointer.find(item) == tree->header_table_pointer.end()) {
+				tree->header_table_pointer[item] = new HeaderTableNode();
+			}
 			if (tree->header_table_pointer[item]->end == nullptr) {
 				tree->header_table_pointer[item]->start = treeNode->child[item];
 				tree->header_table_pointer[item]->end = treeNode->child[item];
