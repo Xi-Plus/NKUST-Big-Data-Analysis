@@ -213,6 +213,7 @@ class FPGrowth {
 					std::cout << (char)('a' + item.first) << std::endl;
 					if (now->child.find(item.first) == now->child.end()) {
 						now->child[item.first] = new TreeNode(item.first);
+						now->child[item.first]->parent = now;
 						if (forest->header_table_pointer[item.first]->end == nullptr) {
 							forest->header_table_pointer[item.first]->start = now->child[item.first];
 							forest->header_table_pointer[item.first]->end = now->child[item.first];
@@ -410,7 +411,7 @@ class FPGrowth {
 	}
 */
 	// Debug
-	void dumpTree(Tree* tree) {
+	void dumpTree(Tree *tree) {
 		dfsPrintTree(tree->tree);
 		for (auto iter = tree->header_table_pointer.begin(); iter != tree->header_table_pointer.end(); ++iter) {
 			auto now = iter->second->start;
