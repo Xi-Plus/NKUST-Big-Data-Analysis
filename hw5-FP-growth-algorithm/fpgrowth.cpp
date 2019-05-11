@@ -8,6 +8,8 @@
 #include <unordered_set>
 #include <vector>
 
+using namespace std;
+
 // #define COUNTING_CATEGORY
 
 class FPGrowth {
@@ -15,7 +17,7 @@ class FPGrowth {
 	struct TreeNode {
 		unsigned int item;
 		unsigned int count;
-		std::unordered_map<int, TreeNode *> child;
+		unordered_map<int, TreeNode *> child;
 		TreeNode *next = nullptr;
 		TreeNode *parent = nullptr;
 		TreeNode(unsigned int _item) {
@@ -28,12 +30,12 @@ class FPGrowth {
 		TreeNode *end = nullptr;
 	};
 	struct Tree {
-		std::vector<unsigned int> prefix;
+		vector<unsigned int> prefix;
 		TreeNode *tree;
-		std::vector<std::pair<unsigned int, HeaderTableNode *>> header_table;
-		std::unordered_map<unsigned int, HeaderTableNode *> header_table_pointer;
-		std::unordered_map<unsigned int, Tree *> child_tree;
-		Tree(std::vector<unsigned int> _prefix) {
+		vector<pair<unsigned int, HeaderTableNode *>> header_table;
+		unordered_map<unsigned int, HeaderTableNode *> header_table_pointer;
+		unordered_map<unsigned int, Tree *> child_tree;
+		Tree(vector<unsigned int> _prefix) {
 			prefix = _prefix;
 			tree = new TreeNode(-1);
 		}
@@ -42,15 +44,15 @@ class FPGrowth {
 	// Arguments
 	char inputpath[100], outputpath[100];
 	unsigned int support;
-	std::fstream fin, fout;
+	fstream fin, fout;
 	// Data
-	std::unordered_map<int, int> C1;
-	std::vector<std::pair<int, int>> L1;
+	unordered_map<int, int> C1;
+	vector<pair<int, int>> L1;
 	Tree *forest;
 	/*
-	std::unordered_map<Node *, int> Csup;
-	std::vector<std::vector<unsigned int>> Ctemp, Cits;
-	std::unordered_set<std::vector<unsigned int>, vector_hash> Lset;
+	unordered_map<Node *, int> Csup;
+	vector<vector<unsigned int>> Ctemp, Cits;
+	unordered_set<vector<unsigned int>, vector_hash> Lset;
 	Node *root;
 	int grouplen = 1;
 	unsigned int Llen = 0;*/
@@ -65,7 +67,7 @@ class FPGrowth {
 	/*
 	bool inTrie;
 	Node *tempNode;
-	std::vector<unsigned int> tempv;*/
+	vector<unsigned int> tempv;*/
 
    public:
 	FPGrowth(char *_inputpath, char *_outputpath, unsigned int _support) {
@@ -74,19 +76,19 @@ class FPGrowth {
 		support = _support;
 	}
 	unsigned int run() {
-		fout.open(outputpath, std::fstream::out);
+		fout.open(outputpath, fstream::out);
 		if (!fout.is_open()) {
-			std::cerr << "Fail to open output file";
+			cerr << "Fail to open output file";
 			exit(1);
 		}
 
-		forest = new Tree(std::vector<unsigned int>(0, 0));
+		forest = new Tree(vector<unsigned int>(0, 0));
 
 		generateC1();
 		generateL1();
-		std::cout << L1.size() << std::endl;
+		cout << L1.size() << endl;
 		for (auto v : L1) {
-			std::cout << (char)('a' + v.first) << " " << v.second << std::endl;
+			cout << (char)('a' + v.first) << " " << v.second << endl;
 		}
 		buildTree();
 
@@ -137,9 +139,9 @@ class FPGrowth {
 	}
 
 	void generateC1() {
-		fin.open(inputpath, std::fstream::in | std::fstream::binary);
+		fin.open(inputpath, fstream::in | fstream::binary);
 		if (!fin.is_open()) {
-			std::cerr << "Fail to open input file";
+			cerr << "Fail to open input file";
 			exit(1);
 		}
 
@@ -150,43 +152,43 @@ class FPGrowth {
 			cnt = readint();
 			while (cnt--) {
 				tempn = readint();
-				std::cout << (char)('a' + tempn) << " ";
+				cout << (char)('a' + tempn) << " ";
 				C1[tempn]++;
 			}
-			std::cout << std::endl;
+			cout << endl;
 		}
 		fin.close();
 	}
 
-	static bool L1Cmp(const std::pair<int, int> &a, const std::pair<int, int> &b) {
+	static bool L1Cmp(const pair<int, int> &a, const pair<int, int> &b) {
 		return a.second > b.second;
 	}
 
 	void generateL1() {
 		for (auto &v : C1) {
 			if (v.second >= support) {
-				L1.push_back(std::make_pair(v.first, v.second));
+				L1.push_back(make_pair(v.first, v.second));
 			}
 		}
 		sort(L1.begin(), L1.end(), L1Cmp);
 		L1.clear();
-		L1.push_back(std::make_pair(5, 4));
-		L1.push_back(std::make_pair(2, 4));
-		L1.push_back(std::make_pair(0, 3));
-		L1.push_back(std::make_pair(1, 3));
-		L1.push_back(std::make_pair(12, 3));
-		L1.push_back(std::make_pair(15, 3));
+		L1.push_back(make_pair(5, 4));
+		L1.push_back(make_pair(2, 4));
+		L1.push_back(make_pair(0, 3));
+		L1.push_back(make_pair(1, 3));
+		L1.push_back(make_pair(12, 3));
+		L1.push_back(make_pair(15, 3));
 		for (auto &v : L1) {
 			HeaderTableNode *htn = new HeaderTableNode();
-			forest->header_table.push_back(std::make_pair(v.first, htn));
+			forest->header_table.push_back(make_pair(v.first, htn));
 			forest->header_table_pointer[v.first] = htn;
 		}
 	}
 
 	void buildTree() {
-		fin.open(inputpath, std::fstream::in | std::fstream::binary);
+		fin.open(inputpath, fstream::in | fstream::binary);
 		if (!fin.is_open()) {
-			std::cerr << "Fail to open input file";
+			cerr << "Fail to open input file";
 			exit(1);
 		}
 
@@ -195,22 +197,22 @@ class FPGrowth {
 			if (fin.eof()) break;
 			readint();
 			cnt = readint();
-			std::unordered_map<unsigned int, bool> items;
+			unordered_map<unsigned int, bool> items;
 			while (cnt--) {
 				tempn = readint();
-				std::cout << (char)('a' + tempn) << " ";
+				cout << (char)('a' + tempn) << " ";
 				if (forest->header_table_pointer.find(tempn) != forest->header_table_pointer.end()) {
 					items[tempn] = true;
-					std::cout << "+ ";
+					cout << "+ ";
 				} else {
-					std::cout << "- ";
+					cout << "- ";
 				}
 			}
-			std::cout << std::endl;
+			cout << endl;
 			TreeNode *now = forest->tree;
 			for (auto &item : L1) {
 				if (items.find(item.first) != items.end()) {
-					std::cout << (char)('a' + item.first) << std::endl;
+					cout << (char)('a' + item.first) << endl;
 					if (now->child.find(item.first) == now->child.end()) {
 						now->child[item.first] = new TreeNode(item.first);
 						now->child[item.first]->parent = now;
@@ -226,13 +228,13 @@ class FPGrowth {
 					now->count++;
 				}
 			}
-			std::cout << std::endl;
+			cout << endl;
 			dumpTree(forest);
 		}
 		fin.close();
 	}
 	/*
-	void dfsOutputFile(Node *&now, std::vector<unsigned int> item) {
+	void dfsOutputFile(Node *&now, vector<unsigned int> item) {
 		if (now->level == grouplen) {
 			// outputFile
 			fout << item[0];
@@ -245,11 +247,11 @@ class FPGrowth {
 			// generateCits
 			if (now->child.size() >= 2) {
 				for (auto i = now->child.begin(); i != now->child.end(); i++) {
-					for (auto j = std::next(i, 1); j != now->child.end(); j++) {
+					for (auto j = next(i, 1); j != now->child.end(); j++) {
 						Ctemp.push_back(item);
 						tempa = i->first;
 						tempb = j->first;
-						if (tempa > tempb) std::swap(tempa, tempb);
+						if (tempa > tempb) swap(tempa, tempb);
 						Ctemp[Ctemp.size() - 1].push_back(tempa);
 						Ctemp[Ctemp.size() - 1].push_back(tempb);
 					}
@@ -258,7 +260,7 @@ class FPGrowth {
 		}
 		if (now->level < grouplen) {
 			for (auto &next : now->child) {
-				std::vector<unsigned int> nextitem = item;
+				vector<unsigned int> nextitem = item;
 				nextitem.push_back(next.first);
 				dfsOutputFile(next.second, nextitem);
 			}
@@ -268,7 +270,7 @@ class FPGrowth {
 	void outputFile() {
 		Ctemp.clear();
 
-		dfsOutputFile(root, std::vector<unsigned int>());
+		dfsOutputFile(root, vector<unsigned int>());
 	}
 	void generateC() {
 		if (grouplen == 2 || grouplen < CtempMin || CtempMax < grouplen) {
@@ -315,16 +317,16 @@ class FPGrowth {
 
 		start_time = clock();
 		// cnt sup
-		fin.open(inputpath, std::fstream::in | std::fstream::binary);
+		fin.open(inputpath, fstream::in | fstream::binary);
 		if (!fin.is_open()) {
-			std::cerr << "Fail to open input file";
+			cerr << "Fail to open input file";
 			exit(1);
 		}
 		unsigned int cnt;
 #ifdef COUNTING_CATEGORY
-		std::unordered_map<unsigned int, std::vector<Node *>> nownode;
+		unordered_map<unsigned int, vector<Node *>> nownode;
 #else
-		std::vector<Node *> nownode;
+		vector<Node *> nownode;
 #endif
 		while (true) {
 			tempn = readint();
@@ -369,7 +371,7 @@ class FPGrowth {
 			printf("  cntSup tooks %d milliseconds\n", (clock() - start_time) * 1000 / CLOCKS_PER_SEC);
 	}
 
-	void dfsGenerateL(Node *&now, std::vector<unsigned int> item) {
+	void dfsGenerateL(Node *&now, vector<unsigned int> item) {
 		if (now->level == grouplen - 1) {
 			for (auto next = now->child.begin(); next != now->child.end();) {
 				if (Csup[next->second] < support) {
@@ -377,7 +379,7 @@ class FPGrowth {
 				} else {
 					// generateLset
 					if (CtempMin <= grouplen + 1 && grouplen + 1 <= CtempMax) {
-						std::vector<unsigned int> nextitem = item;
+						vector<unsigned int> nextitem = item;
 						nextitem.push_back(next->first);
 						Lset.insert(nextitem);
 					}
@@ -388,7 +390,7 @@ class FPGrowth {
 			}
 		} else if (now->level < grouplen - 1) {
 			for (auto &next : now->child) {
-				std::vector<unsigned int> nextitem = item;
+				vector<unsigned int> nextitem = item;
 				nextitem.push_back(next.first);
 				dfsGenerateL(next.second, nextitem);
 			}
@@ -407,7 +409,7 @@ class FPGrowth {
 			Lset.clear();
 		}
 
-		dfsGenerateL(root, std::vector<unsigned int>());
+		dfsGenerateL(root, vector<unsigned int>());
 	}
 */
 	// Debug
@@ -416,29 +418,29 @@ class FPGrowth {
 		for (auto iter = tree->header_table_pointer.begin(); iter != tree->header_table_pointer.end(); ++iter) {
 			auto now = iter->second->start;
 			while (now != nullptr && now->next != nullptr) {
-				std::cout << now << "-" << (char)('a' + now->item) << "-" << now->count << " "
-						  << now->next << "-" << (char)('a' + now->next->item) << "-" << now->next->count << " *"
-						  << std::endl;
+				cout << now << "-" << (char)('a' + now->item) << "-" << now->count << " "
+					 << now->next << "-" << (char)('a' + now->next->item) << "-" << now->next->count << " *"
+					 << endl;
 
 				now = now->next;
 			}
 		}
-		std::cout << std::endl
-				  << "----------"
-				  << std::endl;
+		cout << endl
+			 << "----------"
+			 << endl;
 	}
 	void dfsPrintTree(TreeNode *&now) {
 		for (auto iter = now->child.begin(); iter != now->child.end(); ++iter) {
-			std::cout << now << "-" << (char)('a' + now->item) << "-" << now->count << " "
-					  << iter->second << "-" << (char)('a' + iter->second->item) << "-" << iter->second->count << std::endl;
+			cout << now << "-" << (char)('a' + now->item) << "-" << now->count << " "
+				 << iter->second << "-" << (char)('a' + iter->second->item) << "-" << iter->second->count << endl;
 			dfsPrintTree(iter->second);
 		}
 	}
 	/*
 	void printTrie() {
-		std::cout << "------Trie------\n";
-		dfsPrintTrie(root, std::vector<unsigned int>());
-		std::cout << "------Trie end----------\n";
+		cout << "------Trie------\n";
+		dfsPrintTrie(root, vector<unsigned int>());
+		cout << "------Trie end----------\n";
 	}
 	*/
 };
