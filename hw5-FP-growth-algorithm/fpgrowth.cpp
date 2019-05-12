@@ -50,6 +50,7 @@ class FPGrowth {
 		~Tree() {
 			header_table_list.clear();
 			header_table_pointer.clear();
+			free(tree);
 		}
 	};
 
@@ -105,6 +106,7 @@ class FPGrowth {
 		generateC1();
 		generateL1();
 		cout << "L1: " << L1.size() << endl;
+		// return 0;
 		// for (auto v : L1) {
 		// 	cout << _format_char(v.first) << ":" << v.second << endl;
 		// }
@@ -180,6 +182,7 @@ class FPGrowth {
 			HeaderTableNode *htn = new HeaderTableNode();
 			forest->header_table_list.push_back(make_pair(v.first, htn));
 			forest->header_table_pointer[v.first] = htn;
+			// fout << _format_char(v.first) << ":" << v.second << "\n";
 		}
 		reverse(forest->header_table_list.begin(), forest->header_table_list.end());
 	}
@@ -218,8 +221,9 @@ class FPGrowth {
 				}
 			}
 			// cout << endl;
-			// dumpTree(forest);
 		}
+		// dumpTree(forest);
+		// dumpHeaderTable(forest);
 		fin.close();
 	}
 
@@ -265,6 +269,7 @@ class FPGrowth {
 	}
 
 	void buildSubTree(Tree *fromTree, unsigned int leafItem) {
+		// cout << "==============================================" << endl;
 		// cout << "buildSubTree " << _format_char(leafItem);
 		// cout << " Base on ";
 		// for (auto v : fromTree->prefix) {
@@ -273,71 +278,140 @@ class FPGrowth {
 		// cout << endl;
 
 		if (fromTree->header_table_pointer.find(leafItem) == fromTree->header_table_pointer.end()) {
+			cout << "Quit buildSubTree" << endl;
 			return;
 		}
 
 		TreeNode *leaf = fromTree->header_table_pointer[leafItem]->start;
 
-		vector<unsigned int> prefix(fromTree->prefix);
-		prefix.push_back(leafItem);
-		Tree *subTree = new Tree(prefix);
-		subTree->header_table_list = vector<pair<unsigned int, HeaderTableNode *>>(fromTree->header_table_list);
+		// cout << "prepare tree done" << endl;
 
 		unordered_map<unsigned int, unsigned int> count;
 		while (leaf != nullptr) {
-			// cout << "leaf " << leaf << endl;
 			count[leaf->item] += leaf->count;
 
 			TreeNode *now = leaf->parent;
-			vector<unsigned int> pathItems;
 			while (now->parent != nullptr) {
 				count[now->item] += leaf->count;
-				pathItems.push_back(now->item);
-				// cout << now << " Add " << _format_char(now->item) << " " << leaf->count << endl;
 				now = now->parent;
 			}
 
-			reverse(pathItems.begin(), pathItems.end());
-			now = subTree->tree;
-			for (auto &item : pathItems) {
-				now = addItemToTreeNode(subTree, now, item, leaf->count);
-			}
-
-			// Move next leaf
 			leaf = leaf->next;
 		}
 
 		// Output file
 		// cout << "Ouput " << count[leafItem] << endl;
+		if (count[leafItem] < support) {
+			cout << "Not meet support " << count[leafItem] << endl;
+			cout << "buildSubTree " << _format_char(leafItem);
+			cout << " Base on ";
+			for (auto v : fromTree->prefix) {
+				cout << _format_char(v) << " ";
+			}
+			cout << endl;
+			dumpTree(fromTree);
+			return;
+		}
 		for (auto &v : fromTree->prefix) {
 			fout << _format_char(v) << ",";
 		}
 		fout << _format_char(leafItem);
 		fout << ":" << count[leafItem] << "\n";
 		Llensum++;
-		// cout << "Llensum " << Llensum << endl;
+		// cout << "Llensum " << Llensum << " " << count.size() << endl;
+
+		vector<unsigned int> prefix(fromTree->prefix);
+		prefix.push_back(leafItem);
+		Tree *subTree = new Tree(prefix);
+
+		// Create subTree
+		leaf = fromTree->header_table_pointer[leafItem]->start;
+		while (leaf != nullptr) {
+			TreeNode *now = leaf->parent;
+			vector<pair<unsigned int, unsigned int>> pathItems;
+			while (now->parent != nullptr) {
+				pathItems.push_back(make_pair(now->item,leaf->count));
+				// cout << _format_char(now->item) << " " <<leaf->count << endl;
+				now = now->parent;
+			}
+
+			reverse(pathItems.begin(), pathItems.end());
+			now = subTree->tree;
+			for (auto &item : pathItems) {
+				if (count[item.first] < support) {
+					// cout << "Break " << _format_char(item.first) << " " << count[item.first] << endl;
+					continue;
+				}
+				// cout << "Add " << _format_char(item.first) << " " << item.second << endl;
+				now = addItemToTreeNode(subTree, now, item.first, item.second);
+			}
+
+			leaf = leaf->next;
+		}
+
+		if (subTree->header_table_pointer.size() == 0) {
+			free(subTree);
+			// cout << "No next tree" << endl;
+			return;
+		}
+
+		// if (count.size() <= 1) {
+		// 	return;
+		// }
+
+		// vector<pair<unsigned int, unsigned int>> newL;
+		// for (auto it = count.begin(); it != count.end(); it++) {
+		// 	if (it->second >= support && it->first != leafItem) {
+		// 		newL.push_back(make_pair(it->first, it->second));
+		// 	}
+		// }
+
+		// if (newL.size() == 0) {
+		// 	return;
+		// }
+
+		// sort(newL.begin(), newL.end(), L1Cmp);
+
+		// Tree *newTree = new Tree(prefix);
+		// TreeNode *now = newTree->tree;
+		// for (auto &v : newL) {
+		// 	now = addItemToTreeNode(newTree, now, v.first, v.second);
+		// }
+
+		// if (subTree->tree->child.size() == 0) {
+		// 	return;
+		// }
 
 		// pruning
-		for (auto it = subTree->header_table_list.begin(); it != subTree->header_table_list.end();) {
-			if (count.find(it->first) != count.end() && it->first != leafItem) {
-				if (count[it->first] < support) {
-					// cout << "pruning " << _format_char(it->first) << "(" << it->second << ")" << endl;
-					bool x = pruning(subTree, it->first);
-					if (!x) {
-						cout << "pruning " << _format_char(it->first) << "(" << count[it->first] << ")" << endl;
-					}
-					// cout << "Next " << _format_char(it->first) << " " << it->second << " ";}
-				}
-				it++;
-			} else {
-				it = subTree->header_table_list.erase(it);
-			}
-		}
+		// cout << "pruning start" << endl;
+		// for (auto it = subTree->header_table_list.begin(); it != subTree->header_table_list.end();) {
+		// 	if (count.find(it->first) != count.end() && it->first != leafItem) {
+		// 		// cout << "pruning " << _format_char(it->first) << "(" << count[it->first] << ")" << endl;
+		// 		if (count[it->first] < support) {
+		// 			// cout << "pruning " << _format_char(it->first) << "(" << it->second << ")" << endl;
+		// 			bool x = pruning(subTree, it->first);
+		// 			if (!x) {
+		// 				cout << "pruning " << _format_char(it->first) << "(" << count[it->first] << ")" << endl;
+		// 			}
+		// 			// cout << "Next " << _format_char(it->first) << " " << it->second << " ";}
+		// 		}
+		// 		it++;
+		// 	} else {
+		// 		it = subTree->header_table_list.erase(it);
+		// 	}
+		// }
+		// cout << "pruning done" << endl;
 
-		for (auto it = subTree->header_table_list.rbegin(); it != subTree->header_table_list.rend(); it++) {
+		// for (auto it = newL.rbegin(); it != newL.rend(); it++) {
+		// 	// cout << it->first << endl;
+		// 	buildSubTree(newTree, it->first);
+		// }
+		// dumpTree(subTree);
+
+		for (auto it = subTree->header_table_pointer.begin(); it != subTree->header_table_pointer.end(); it++) {
+			// cout << it->first << endl;
 			buildSubTree(subTree, it->first);
 		}
-
 		// allTreeCount--;
 		free(subTree);
 	}
