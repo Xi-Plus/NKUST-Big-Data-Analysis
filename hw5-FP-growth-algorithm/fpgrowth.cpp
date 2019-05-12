@@ -7,8 +7,6 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-#include <limits>
-#include <cstdint>
 
 using namespace std;
 
@@ -46,7 +44,7 @@ class FPGrowth {
 		unordered_map<unsigned int, Tree *> child_tree;
 		Tree(vector<unsigned int> _prefix) {
 			prefix = _prefix;
-			tree = new TreeNode(INT_MAX);
+			tree = new TreeNode(2147483647);
 		}
 		~Tree() {
 			header_table_list.clear();
@@ -310,7 +308,7 @@ class FPGrowth {
 		fout << _format_char(leafItem);
 		fout << ":" << count[leafItem] << "\n";
 		Llensum++;
-		// cout << endl;
+		// cout << "Llensum " << Llensum << endl;
 
 		// pruning
 		for (auto it = subTree->header_table_list.begin(); it != subTree->header_table_list.end();) {
