@@ -244,10 +244,10 @@ class FPGrowth {
 	bool pruning(Tree *tree, unsigned int item) {
 		if (tree->header_table_pointer.find(item) == tree->header_table_pointer.end()) {
 			cout << "pruning error " << tree << " " << item << endl;
-			dumpTree(tree);
-			dumpHeaderTable(tree);
-			cout << endl;
-			cout << endl;
+			// dumpTree(tree);
+			// dumpHeaderTable(tree);
+			// cout << endl;
+			// cout << endl;
 			return false;
 		}
 		TreeNode *node = tree->header_table_pointer[item]->start;
