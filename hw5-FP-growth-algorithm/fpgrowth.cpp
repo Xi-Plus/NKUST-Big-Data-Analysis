@@ -352,12 +352,12 @@ class FPGrowth {
 		free(fromTree->child_tree[leafItem]);
 	}
 
-	char _format_char(unsigned int item) {
-		return 'a' + item;
-	}
-	// unsigned int _format_char(unsigned int item) {
-	// 	return item;
+	// char _format_char(unsigned int item) {
+	// 	return 'a' + item;
 	// }
+	unsigned int _format_char(unsigned int item) {
+		return item;
+	}
 
 	// Debug
 	void dumpTree(Tree *tree) {
