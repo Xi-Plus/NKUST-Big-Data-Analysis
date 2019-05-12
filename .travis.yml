@@ -18,8 +18,6 @@ before_install:
 compiler:
   - g++
 
-install: make get-deps
-
 jobs:
   include:
     name: "small"
