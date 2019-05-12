@@ -1,3 +1,4 @@
+#include <cassert>
 #include <cstdio>
 #include <cstring>
 #include <ctime>
@@ -9,7 +10,7 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
 	char inputpath[100], outputpath[100];
-	unsigned int support;
+	unsigned int support, answer = 0;
 	if (argc < 4) {
 		printf("Missing parameter\n");
 		string temps;
@@ -29,6 +30,10 @@ int main(int argc, char *argv[]) {
 	printf("file input: %s\n", inputpath);
 	printf("file output: %s\n", outputpath);
 	printf("support: %d\n", support);
+	if (argc >= 5) {
+		answer = atoi(argv[4]);
+		printf("expected answer: %d\n", answer);
+	}
 
 	clock_t start_time = clock();
 
@@ -38,6 +43,10 @@ int main(int argc, char *argv[]) {
 
 	printf("Lall: %d\n", Llensum);
 	printf("It tooks %ld milliseconds\n", (clock() - start_time) * 1000 / CLOCKS_PER_SEC);
+
+	if (answer > 0) {
+		assert(Llensum == answer);
+	}
 
 	return 0;
 }
