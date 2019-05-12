@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
 	unsigned int Llensum = fpgrowth.run();
 
 	printf("Lall: %d\n", Llensum);
-	printf("It tooks %d milliseconds\n", (clock() - start_time) * 1000 / CLOCKS_PER_SEC);
+	printf("It tooks %ld milliseconds\n", (clock() - start_time) * 1000 / CLOCKS_PER_SEC);
 
 	return 0;
 }
