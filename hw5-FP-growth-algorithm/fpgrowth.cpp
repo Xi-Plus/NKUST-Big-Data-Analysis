@@ -58,7 +58,7 @@ class FPGrowth {
 	unsigned int support;
 	fstream fin, fout;
 	// Data
-	unordered_map<int, int> C1;
+	unordered_map<unsigned int, unsigned int> C1;
 	vector<pair<unsigned int, unsigned int>> L1;
 	Tree *forest;
 	unsigned int Llensum = 0;
