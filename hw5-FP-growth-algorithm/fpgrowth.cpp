@@ -10,6 +10,7 @@
 
 using namespace std;
 
+#define ROOT_VALUE 2147483647
 // #define OUTPUT_ASCII
 
 class FPGrowth {
@@ -43,7 +44,7 @@ class FPGrowth {
 		unordered_map<unsigned int, HeaderTableNode *> header_table_pointer;
 		Tree(vector<unsigned int> _prefix) {
 			prefix = _prefix;
-			tree = new TreeNode(2147483647);
+			tree = new TreeNode(ROOT_VALUE);
 		}
 		~Tree() {
 			header_table_list.clear();
@@ -358,7 +359,13 @@ class FPGrowth {
 	}
 	void dfsPrintTree(TreeNode *&now) {
 		for (auto iter = now->child.begin(); iter != now->child.end(); ++iter) {
-			cout << now << "-" << _format_char(now->item) << "-" << now->count << " "
+			cout << now << "-";
+			if (now->item == ROOT_VALUE) {
+				cout << "ROOT";
+			} else {
+				cout << _format_char(now->item);
+			}
+			cout << "-" << now->count << " "
 				 << iter->second << "-";
 			if (iter->second == 0) {
 				cout << 0 << "-" << 0 << endl;
