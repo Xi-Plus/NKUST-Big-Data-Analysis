@@ -10,7 +10,7 @@
 
 using namespace std;
 
-// #define COUNTING_CATEGORY
+// #define OUTPUT_ASCII
 
 class FPGrowth {
    private:
@@ -338,12 +338,15 @@ class FPGrowth {
 		free(subTree);
 	}
 
-	// char _format_char(unsigned int item) {
-	// 	return 'a' + item;
-	// }
+#ifdef OUTPUT_ASCII
+	char _format_char(unsigned int item) {
+		return 'a' + item;
+	}
+#else
 	unsigned int _format_char(unsigned int item) {
 		return item;
 	}
+#endif
 
 	// Debug
 	void dumpTree(Tree *tree) {
