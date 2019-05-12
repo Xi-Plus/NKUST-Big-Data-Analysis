@@ -334,13 +334,8 @@ class FPGrowth {
 			buildSubTree(subTree, it->first);
 		}
 
-		freeTree(subTree);
-	}
-
-	void freeTree(Tree *tree) {
 		// allTreeCount--;
-
-		free(tree);
+		free(subTree);
 	}
 
 	// char _format_char(unsigned int item) {
