@@ -41,7 +41,6 @@ class FPGrowth {
 		TreeNode *tree;
 		vector<pair<unsigned int, HeaderTableNode *>> header_table_list;
 		unordered_map<unsigned int, HeaderTableNode *> header_table_pointer;
-		unordered_map<unsigned int, Tree *> child_tree;
 		Tree(vector<unsigned int> _prefix) {
 			prefix = _prefix;
 			tree = new TreeNode(2147483647);
@@ -49,7 +48,6 @@ class FPGrowth {
 		~Tree() {
 			header_table_list.clear();
 			header_table_pointer.clear();
-			child_tree.clear();
 		}
 	};
 
@@ -280,7 +278,6 @@ class FPGrowth {
 		prefix.push_back(leafItem);
 		Tree *subTree = new Tree(prefix);
 		subTree->header_table_list = vector<pair<unsigned int, HeaderTableNode *>>(fromTree->header_table_list);
-		fromTree->child_tree[leafItem] = subTree;
 
 		unordered_map<unsigned int, unsigned int> count;
 		while (leaf != nullptr) {
@@ -337,19 +334,13 @@ class FPGrowth {
 			buildSubTree(subTree, it->first);
 		}
 
-		freeTree(fromTree, leafItem);
+		freeTree(subTree);
 	}
 
-	void freeTree(Tree *fromTree, unsigned int leafItem) {
+	void freeTree(Tree *tree) {
 		// allTreeCount--;
-		// cout << "freeTree " << _format_char(leafItem);
-		// cout << " Base on ";
-		// for (auto v : fromTree->prefix) {
-		// 	cout << _format_char(v) << " ";
-		// }
-		// cout << " " << allTreeCount << endl;
 
-		free(fromTree->child_tree[leafItem]);
+		free(tree);
 	}
 
 	// char _format_char(unsigned int item) {
