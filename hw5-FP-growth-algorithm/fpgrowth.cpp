@@ -356,9 +356,7 @@ class FPGrowth {
 	void dumpTree(Tree *tree) {
 		dfsPrintTree(tree->tree);
 		// dumpHeaderTable(tree);
-		cout << endl
-			 << "----------"
-			 << endl;
+		cout << "----------" << endl;
 	}
 	void dfsPrintTree(TreeNode *&now) {
 		for (auto iter = now->child.begin(); iter != now->child.end(); ++iter) {
@@ -380,10 +378,17 @@ class FPGrowth {
 	}
 	void dumpHeaderTable(Tree *tree) {
 		for (auto iter = tree->header_table_pointer.begin(); iter != tree->header_table_pointer.end(); ++iter) {
-			cout << iter->second << " "
-				 << iter->second->start << "-" << _format_char(iter->second->start->item) << "-" << iter->second->start->count
+			// start
+			cout << _format_char(iter->first) << "-" << iter->second << " ";
+			if (iter->second->start == nullptr) {
+				cout << "NULL" << endl;
+				continue;
+			}
+			cout << iter->second->start << "-" << _format_char(iter->second->start->item) << "-" << iter->second->start->count
 				 << " start" << endl;
-			cout << iter->second << " "
+
+			// end
+			cout << _format_char(iter->first) << "-" << iter->second << " "
 				 << iter->second->end << "-" << _format_char(iter->second->end->item) << "-" << iter->second->end->count
 				 << " end" << endl;
 			auto now = iter->second->start;
@@ -395,5 +400,6 @@ class FPGrowth {
 				now = now->next;
 			}
 		}
+		cout << "----------" << endl;
 	}
 };
