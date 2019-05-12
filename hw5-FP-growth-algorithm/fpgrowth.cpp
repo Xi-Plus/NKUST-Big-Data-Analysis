@@ -12,6 +12,7 @@ using namespace std;
 
 #define ROOT_VALUE 2147483647
 // #define OUTPUT_ASCII
+// #define TEST_SMALL
 
 class FPGrowth {
    private:
@@ -166,13 +167,15 @@ class FPGrowth {
 			}
 		}
 		sort(L1.begin(), L1.end(), L1Cmp);
-		// L1.clear();
-		// L1.push_back(make_pair(5, 4));
-		// L1.push_back(make_pair(2, 4));
-		// L1.push_back(make_pair(0, 3));
-		// L1.push_back(make_pair(1, 3));
-		// L1.push_back(make_pair(12, 3));
-		// L1.push_back(make_pair(15, 3));
+#ifdef TEST_SMALL
+		L1.clear();
+		L1.push_back(make_pair(5, 4));
+		L1.push_back(make_pair(2, 4));
+		L1.push_back(make_pair(0, 3));
+		L1.push_back(make_pair(1, 3));
+		L1.push_back(make_pair(12, 3));
+		L1.push_back(make_pair(15, 3));
+#endif
 		for (auto &v : L1) {
 			HeaderTableNode *htn = new HeaderTableNode();
 			forest->header_table_list.push_back(make_pair(v.first, htn));
