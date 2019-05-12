@@ -90,6 +90,8 @@ class FPGrowth {
 		support = _support;
 	}
 	unsigned int run() {
+		std::cout.setf(std::ios::unitbuf);
+
 		fout.open(outputpath, fstream::out);
 		if (!fout.is_open()) {
 			cerr << "Fail to open output file";
