@@ -63,26 +63,9 @@ class FPGrowth {
 	vector<pair<unsigned int, unsigned int>> L1;
 	Tree *forest;
 	unsigned int Llensum = 0;
-	/*
-	unordered_map<Node *, int> Csup;
-	vector<vector<unsigned int>> Ctemp, Cits;
-	unordered_set<vector<unsigned int>, vector_hash> Lset;
-	Node *root;
-	int grouplen = 1;
-	unsigned int Llen = 0;*/
-	// Setting
 
-	bool isShowDetailedTime = false;
-	unsigned int CtempMin = 3;
-	unsigned int CtempMax = 3;
-	// Temporary variables
-	int tempa, tempb, tempc;
+	int tempa;
 	unsigned int tempn, cnt;
-	int allTreeCount = 0;
-	/*
-	bool inTrie;
-	Node *tempNode;
-	vector<unsigned int> tempv;*/
 
    public:
 	FPGrowth(char *_inputpath, char *_outputpath, unsigned int _support) {
@@ -106,25 +89,16 @@ class FPGrowth {
 		generateC1();
 		generateL1();
 		cout << "L1: " << L1.size() << endl;
-		// return 0;
-		// for (auto v : L1) {
-		// 	cout << _format_char(v.first) << ":" << v.second << endl;
-		// }
 
 		buildTree();
-		// return 0;
 
 		for (auto it = forest->header_table_list.begin(); it != forest->header_table_list.end(); it++) {
-			// cout << it->first << endl;
 			buildSubTree(forest, it->first);
 		}
 
 		fout.close();
 
 		return Llensum;
-	}
-	void showDetailedTime(bool setting) {
-		isShowDetailedTime = setting;
 	}
 
    private:
@@ -147,10 +121,8 @@ class FPGrowth {
 			cnt = readint();
 			while (cnt--) {
 				tempn = readint();
-				// cout << _format_char(tempn) << " ";
 				C1[tempn]++;
 			}
-			// cout << endl;
 		}
 		fin.close();
 	}
@@ -182,7 +154,6 @@ class FPGrowth {
 			HeaderTableNode *htn = new HeaderTableNode();
 			forest->header_table_list.push_back(make_pair(v.first, htn));
 			forest->header_table_pointer[v.first] = htn;
-			// fout << _format_char(v.first) << ":" << v.second << "\n";
 		}
 		reverse(forest->header_table_list.begin(), forest->header_table_list.end());
 	}
@@ -194,8 +165,6 @@ class FPGrowth {
 			exit(1);
 		}
 
-		// allTreeCount++;
-
 		while (true) {
 			readint();
 			if (fin.eof()) break;
@@ -204,26 +173,17 @@ class FPGrowth {
 			unordered_map<unsigned int, bool> items;
 			while (cnt--) {
 				tempn = readint();
-				// cout << _format_char(tempn) << " ";
 				if (forest->header_table_pointer.find(tempn) != forest->header_table_pointer.end()) {
 					items[tempn] = true;
-					// cout << "+ ";
-				} else {
-					// cout << "- ";
 				}
 			}
-			// cout << endl;
 			TreeNode *now = forest->tree;
 			for (auto &item : L1) {
 				if (items.find(item.first) != items.end()) {
-					// cout << _format_char(item.first) << endl;
 					now = addItemToTreeNode(forest, now, item.first);
 				}
 			}
-			// cout << endl;
 		}
-		// dumpTree(forest);
-		// dumpHeaderTable(forest);
 		fin.close();
 	}
 
@@ -247,44 +207,8 @@ class FPGrowth {
 		return treeNode->child[item];
 	}
 
-	bool pruning(Tree *tree, unsigned int item) {
-		if (tree->header_table_pointer.find(item) == tree->header_table_pointer.end()) {
-			cout << "pruning error " << tree << " " << item << endl;
-			// dumpTree(tree);
-			// dumpHeaderTable(tree);
-			// cout << endl;
-			// cout << endl;
-			return false;
-		}
-		TreeNode *node = tree->header_table_pointer[item]->start;
-		while (node != nullptr) {
-			node->child.clear();
-			node->parent->child.erase(node->item);
-			auto toDel = node;
-			node = node->next;
-			free(toDel);
-		}
-		tree->header_table_pointer.erase(item);
-		return true;
-	}
-
 	void buildSubTree(Tree *fromTree, unsigned int leafItem) {
-		// cout << "==============================================" << endl;
-		// cout << "buildSubTree " << _format_char(leafItem);
-		// cout << " Base on ";
-		// for (auto v : fromTree->prefix) {
-		// 	cout << _format_char(v) << " ";
-		// }
-		// cout << endl;
-
-		if (fromTree->header_table_pointer.find(leafItem) == fromTree->header_table_pointer.end()) {
-			cout << "Quit buildSubTree" << endl;
-			return;
-		}
-
 		TreeNode *leaf = fromTree->header_table_pointer[leafItem]->start;
-
-		// cout << "prepare tree done" << endl;
 
 		unordered_map<unsigned int, unsigned int> count;
 		while (leaf != nullptr) {
@@ -300,38 +224,24 @@ class FPGrowth {
 		}
 
 		// Output file
-		// cout << "Ouput " << count[leafItem] << endl;
-		if (count[leafItem] < support) {
-			cout << "Not meet support " << count[leafItem] << endl;
-			cout << "buildSubTree " << _format_char(leafItem);
-			cout << " Base on ";
-			for (auto v : fromTree->prefix) {
-				cout << _format_char(v) << " ";
-			}
-			cout << endl;
-			dumpTree(fromTree);
-			return;
-		}
 		for (auto &v : fromTree->prefix) {
 			fout << _format_char(v) << ",";
 		}
 		fout << _format_char(leafItem);
 		fout << ":" << count[leafItem] << "\n";
 		Llensum++;
-		// cout << "Llensum " << Llensum << " " << count.size() << endl;
 
+		// Create subTree
 		vector<unsigned int> prefix(fromTree->prefix);
 		prefix.push_back(leafItem);
 		Tree *subTree = new Tree(prefix);
 
-		// Create subTree
 		leaf = fromTree->header_table_pointer[leafItem]->start;
 		while (leaf != nullptr) {
 			TreeNode *now = leaf->parent;
 			vector<pair<unsigned int, unsigned int>> pathItems;
 			while (now->parent != nullptr) {
-				pathItems.push_back(make_pair(now->item,leaf->count));
-				// cout << _format_char(now->item) << " " <<leaf->count << endl;
+				pathItems.push_back(make_pair(now->item, leaf->count));
 				now = now->parent;
 			}
 
@@ -339,10 +249,8 @@ class FPGrowth {
 			now = subTree->tree;
 			for (auto &item : pathItems) {
 				if (count[item.first] < support) {
-					// cout << "Break " << _format_char(item.first) << " " << count[item.first] << endl;
 					continue;
 				}
-				// cout << "Add " << _format_char(item.first) << " " << item.second << endl;
 				now = addItemToTreeNode(subTree, now, item.first, item.second);
 			}
 
@@ -351,68 +259,12 @@ class FPGrowth {
 
 		if (subTree->header_table_pointer.size() == 0) {
 			free(subTree);
-			// cout << "No next tree" << endl;
 			return;
 		}
 
-		// if (count.size() <= 1) {
-		// 	return;
-		// }
-
-		// vector<pair<unsigned int, unsigned int>> newL;
-		// for (auto it = count.begin(); it != count.end(); it++) {
-		// 	if (it->second >= support && it->first != leafItem) {
-		// 		newL.push_back(make_pair(it->first, it->second));
-		// 	}
-		// }
-
-		// if (newL.size() == 0) {
-		// 	return;
-		// }
-
-		// sort(newL.begin(), newL.end(), L1Cmp);
-
-		// Tree *newTree = new Tree(prefix);
-		// TreeNode *now = newTree->tree;
-		// for (auto &v : newL) {
-		// 	now = addItemToTreeNode(newTree, now, v.first, v.second);
-		// }
-
-		// if (subTree->tree->child.size() == 0) {
-		// 	return;
-		// }
-
-		// pruning
-		// cout << "pruning start" << endl;
-		// for (auto it = subTree->header_table_list.begin(); it != subTree->header_table_list.end();) {
-		// 	if (count.find(it->first) != count.end() && it->first != leafItem) {
-		// 		// cout << "pruning " << _format_char(it->first) << "(" << count[it->first] << ")" << endl;
-		// 		if (count[it->first] < support) {
-		// 			// cout << "pruning " << _format_char(it->first) << "(" << it->second << ")" << endl;
-		// 			bool x = pruning(subTree, it->first);
-		// 			if (!x) {
-		// 				cout << "pruning " << _format_char(it->first) << "(" << count[it->first] << ")" << endl;
-		// 			}
-		// 			// cout << "Next " << _format_char(it->first) << " " << it->second << " ";}
-		// 		}
-		// 		it++;
-		// 	} else {
-		// 		it = subTree->header_table_list.erase(it);
-		// 	}
-		// }
-		// cout << "pruning done" << endl;
-
-		// for (auto it = newL.rbegin(); it != newL.rend(); it++) {
-		// 	// cout << it->first << endl;
-		// 	buildSubTree(newTree, it->first);
-		// }
-		// dumpTree(subTree);
-
 		for (auto it = subTree->header_table_pointer.begin(); it != subTree->header_table_pointer.end(); it++) {
-			// cout << it->first << endl;
 			buildSubTree(subTree, it->first);
 		}
-		// allTreeCount--;
 		free(subTree);
 	}
 
@@ -429,7 +281,6 @@ class FPGrowth {
 	// Debug
 	void dumpTree(Tree *tree) {
 		dfsPrintTree(tree->tree);
-		// dumpHeaderTable(tree);
 		cout << "----------" << endl;
 	}
 	void dfsPrintTree(TreeNode *&now) {
