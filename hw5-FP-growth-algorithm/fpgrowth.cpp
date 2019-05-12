@@ -327,7 +327,7 @@ class FPGrowth {
 			}
 		}
 
-		for (auto it = subTree->header_table_pointer.begin(); it != subTree->header_table_pointer.end(); it++) {
+		for (auto it = subTree->header_table_list.rbegin(); it != subTree->header_table_list.rend(); it++) {
 			buildSubTree(subTree, it->first);
 		}
 
