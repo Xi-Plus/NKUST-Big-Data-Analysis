@@ -268,6 +268,10 @@ class FPGrowth {
 		// }
 		// cout << endl;
 
+		if (fromTree->header_table_pointer.find(leafItem) == fromTree->header_table_pointer.end()) {
+			return;
+		}
+
 		TreeNode *leaf = fromTree->header_table_pointer[leafItem]->start;
 
 		vector<unsigned int> prefix(fromTree->prefix);
