@@ -38,7 +38,6 @@ int main(int argc, char *argv[]) {
 	clock_t start_time = clock();
 
 	FPGrowth fpgrowth(inputpath, outputpath, support);
-	fpgrowth.showDetailedTime(true);
 	unsigned int Llensum = fpgrowth.run();
 
 	printf("Lall: %d\n", Llensum);
