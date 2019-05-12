@@ -2,39 +2,62 @@ language: cpp
 
 sudo: false
 
-before_install:
-- cd hw5-FP-growth-algorithm
-- mkdir data
-- curl https://dev.tfcis.org/~xiplus/Big-Data/small.data -o data/small.data
-- curl https://dev.tfcis.org/~xiplus/Big-Data/T10I10N0.1KD1K.data -o data/T10I10N0.1KD1K.data
-- curl https://dev.tfcis.org/~xiplus/Big-Data/T12I30N0.5KD100K.data -o data/T12I30N0.5KD100K.data
-- curl https://dev.tfcis.org/~xiplus/Big-Data/T15I7N0.5KD1000K.data -o data/T15I7N0.5KD1000K.data
-- curl https://dev.tfcis.org/~xiplus/Big-Data/T15I7N0.5KD100K.data -o data/T15I7N0.5KD100K.data
-- curl https://dev.tfcis.org/~xiplus/Big-Data/T15I7N0.5KD10K.data -o data/T15I7N0.5KD10K.data
-- curl https://dev.tfcis.org/~xiplus/Big-Data/T15I7N0.5KD1K.data -o data/T15I7N0.5KD1K.data
-- curl https://dev.tfcis.org/~xiplus/Big-Data/T18I20N2KD5000K.data -o data/T18I20N2KD5000K.data
-- curl https://dev.tfcis.org/~xiplus/Big-Data/T20I15N1KD10K.data -o data/T20I15N1KD10K.data
-
 compiler:
   - g++
 
 jobs:
   include:
     - name: "small"
-      script: make 0
+      script:
+        cd hw5-FP-growth-algorithm
+        mkdir data
+        curl https://dev.tfcis.org/~xiplus/Big-Data/small.data -o data/small.data
+        make 0
     - name: "T15I7N0.5KD1K"
-      script: make 1
+      script:
+        cd hw5-FP-growth-algorithm
+        mkdir data
+        curl https://dev.tfcis.org/~xiplus/Big-Data/T15I7N0.5KD1K -o data/T15I7N0.5KD1K
+        make 1
     - name: "T15I7N0.5KD10K"
-      script: make 2
+      script:
+        cd hw5-FP-growth-algorithm
+        mkdir data
+        curl https://dev.tfcis.org/~xiplus/Big-Data/T15I7N0.5KD10K -o data/T15I7N0.5KD10K
+        make 2
     - name: "T15I7N0.5KD100K"
-      script: make 3
+      script:
+        cd hw5-FP-growth-algorithm
+        mkdir data
+        curl https://dev.tfcis.org/~xiplus/Big-Data/T15I7N0.5KD100K -o data/T15I7N0.5KD100K
+        make 3
     - name: "T15I7N0.5KD1000K"
-      script: make 4
+      script:
+        cd hw5-FP-growth-algorithm
+        mkdir data
+        curl https://dev.tfcis.org/~xiplus/Big-Data/T15I7N0.5KD1000K -o data/T15I7N0.5KD1000K
+        make 4
     - name: "T10I10N0.1KD1K"
-      script: make 5
+      script:
+        cd hw5-FP-growth-algorithm
+        mkdir data
+        curl https://dev.tfcis.org/~xiplus/Big-Data/T10I10N0.1KD1K -o data/T10I10N0.1KD1K
+        make 5
     - name: "T20I15N1KD10K"
-      script: make 6
+      script:
+        cd hw5-FP-growth-algorithm
+        mkdir data
+        curl https://dev.tfcis.org/~xiplus/Big-Data/T20I15N1KD10K -o data/T20I15N1KD10K
+        make 6
     - name: "T12I30N0.5KD100K"
-      script: make 7
+      script:
+        cd hw5-FP-growth-algorithm
+        mkdir data
+        curl https://dev.tfcis.org/~xiplus/Big-Data/T12I30N0.5KD100K -o data/T12I30N0.5KD100K
+        make 7
     - name: "T18I20N2KD5000K"
-      script: make 8
+      script:
+        cd hw5-FP-growth-algorithm
+        mkdir data
+        curl https://dev.tfcis.org/~xiplus/Big-Data/T18I20N2KD5000K -o data/T18I20N2KD5000K
+        make 8
