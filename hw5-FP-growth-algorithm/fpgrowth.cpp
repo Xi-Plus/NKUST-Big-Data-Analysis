@@ -92,7 +92,7 @@ class FPGrowth {
 
 		buildTree();
 
-		for (auto it = forest->header_table_list.begin(); it != forest->header_table_list.end(); it++) {
+		for (auto it = forest->header_table_pointer.begin(); it != forest->header_table_pointer.end(); it++) {
 			buildSubTree(forest, it->first);
 		}
 
