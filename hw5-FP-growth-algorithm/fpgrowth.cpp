@@ -41,14 +41,12 @@ class FPGrowth {
 	struct Tree {
 		vector<unsigned int> prefix;
 		TreeNode *tree;
-		vector<pair<unsigned int, HeaderTableNode *>> header_table_list;
 		unordered_map<unsigned int, HeaderTableNode *> header_table_pointer;
 		Tree(vector<unsigned int> _prefix) {
 			prefix = _prefix;
 			tree = new TreeNode(ROOT_VALUE);
 		}
 		~Tree() {
-			header_table_list.clear();
 			header_table_pointer.clear();
 			free(tree);
 		}
@@ -149,10 +147,8 @@ class FPGrowth {
 #endif
 		for (auto &v : L1) {
 			HeaderTableNode *htn = new HeaderTableNode();
-			forest->header_table_list.push_back(make_pair(v.first, htn));
 			forest->header_table_pointer[v.first] = htn;
 		}
-		reverse(forest->header_table_list.begin(), forest->header_table_list.end());
 	}
 
 	void buildTree() {
