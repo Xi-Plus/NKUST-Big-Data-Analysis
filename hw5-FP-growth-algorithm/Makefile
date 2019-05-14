@@ -2,12 +2,6 @@ outputsuf = .out.txt
 
 all: 1
 
-clean:
-	del *.exe
-
-main: main.cpp fpgrowth.cpp
-	g++ -o main main.cpp -std=c++11 -O3
-
 0: main
 	./main data/small.data data/small-out.txt 3 18
 
@@ -34,3 +28,15 @@ main: main.cpp fpgrowth.cpp
 
 8: main
 	./main data/T18I20N2KD5000K.data data/T18I20N2KD5000K${outputsuf} 65000 413
+
+main: main.o fpgrowth.o
+	g++ -o main main.o -std=c++11 -O3
+
+main.o: main.cpp
+	g++ -c main.cpp -std=c++11 -O3
+
+fpgrowth.o: fpgrowth.cpp
+	g++ -c fpgrowth.cpp -std=c++11 -O3
+
+clean:
+	del *.exe
