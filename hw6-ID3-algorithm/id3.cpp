@@ -29,6 +29,8 @@ class ID3 {
 	vector<unordered_map<string, int>> str2int;
 	vector<unordered_map<int, string>> int2str;
 	TreeNode *root;
+	// Temp
+	char temps[100];
 
    public:
 	ID3(char *_inputpath, char *_outputpath) {
@@ -87,7 +89,7 @@ class ID3 {
 		// }
 		root = new TreeNode();
 		dfssplit(root, data);
-		dfsprint(root);
+		dfsprint(root, "");
 
 		fout.close();
 	}
@@ -156,34 +158,27 @@ class ID3 {
 		return entropy;
 	}
 
-	void dfsprint(TreeNode *root) {
+	void dfsprint(TreeNode *root, string prefix) {
+		if (root->child.size() == 0) {
+			sprintf(temps, "%s\n",
+					strNorm(int2str[columnsize - 1][root->splitby]).c_str());
+			fout << temps;
+			return;
+		} else {
+			sprintf(temps, "%s\n",
+					strNorm(column[root->splitby]).c_str());
+			fout << temps;
+		}
+		unsigned int lastchild = root->child.size() - 1;
+		while (root->child[lastchild] == nullptr) lastchild--;
 		for (int q = 0; q < root->child.size(); q++) {
 			if (root->child[q] != nullptr) {
-				// printf("%d %d %d\n",
-				// 	   (root->splitby),
-				// 	   (root->child[q]->child.size() == 0
-				// 			? (root->child[q]->splitby)
-				// 			: (root->child[q]->splitby)),
-				// 	   (q + 1));
-				// printf("%x-%s %x-%s %s\n",
-				// 	   root,
-				// 	   strNorm(column[root->splitby]).c_str(),
-				// 	   root->child[q],
-				// 	   (root->child[q]->child.size() == 0
-				// 			? strNorm(int2str[columnsize - 1][root->child[q]->splitby]).c_str()
-				// 			: strNorm(column[root->child[q]->splitby]).c_str()),
-				// 	   strNorm(int2str[root->splitby][q + 1]).c_str());
-				char ss[100];
-				sprintf(ss, "%x-%s %x-%s %s\n",
-						root,
-						strNorm(column[root->splitby]).c_str(),
-						root->child[q],
-						(root->child[q]->child.size() == 0
-							 ? strNorm(int2str[columnsize - 1][root->child[q]->splitby]).c_str()
-							 : strNorm(column[root->child[q]->splitby]).c_str()),
+				sprintf(temps, "%s%s───%s───",
+						prefix.c_str(),
+						(q == lastchild ? "└" : "├"),
 						strNorm(int2str[root->splitby][q + 1]).c_str());
-				fout << ss;
-				dfsprint(root->child[q]);
+				fout << temps;
+				dfsprint(root->child[q], prefix + (q == lastchild ? "    " : "|   "));
 			}
 		}
 	}
