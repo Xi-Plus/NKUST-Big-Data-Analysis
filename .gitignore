@@ -1,6 +1,7 @@
 .vscode/
 hw2-apriori-algorithm/manager-data/
 *.bmp
+*.csv
 *.data
 *.exe
 *.in
